@@ -20,6 +20,10 @@ TBD
 
 TBD
 
+## Files Allowed To Change
+
+TBD
+
 ## Files Not To Change
 
 TBD
@@ -31,6 +35,14 @@ TBD
 ## Validation Completed
 
 TBD
+
+## Human Approval Status
+
+TBD
+
+## Human Approval Boundaries
+
+Pushing, merging, publishing, creating releases, deploying to production, deleting remote resources, rotating credentials, uploading signing keys, and app-store submission require explicit human approval in the current task.
 
 ## Known Risks
 

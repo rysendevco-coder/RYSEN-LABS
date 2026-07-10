@@ -2,7 +2,7 @@
 
 This changelog follows a Keep a Changelog-inspired structure.
 
-## [0.1.0] - Foundation
+## [0.1.0] - 2026-07-10 - Foundation
 
 ### Added
 
@@ -15,3 +15,10 @@ This changelog follows a Keep a Changelog-inspired structure.
 - Architecture decision record process.
 - Initial ADR for specialized agents.
 - Human approval policy and agent handoff protocol.
+
+### Changed
+
+- Tightened approval language across contribution guidance and Codex agent definitions.
+- Added approval status and allowed-file fields to handoff guidance.
+- Reduced default agent concurrency to lower the risk of overlapping write-heavy work.
+- Clarified Codex adoption files in the README.

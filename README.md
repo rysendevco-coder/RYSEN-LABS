@@ -47,17 +47,20 @@ README.md                Framework introduction
 ## Adopting The Framework
 
 1. Copy the relevant documents into a project repository.
-2. Create a project-specific context file from [PROJECT_CONTEXT.template.md](templates/PROJECT_CONTEXT.template.md).
-3. Review [FRAMEWORK_OVERVIEW.md](docs/FRAMEWORK_OVERVIEW.md) and [ENGINEERING_GUIDE.md](docs/ENGINEERING_GUIDE.md).
-4. Customize agent scope only where the project context requires it.
-5. Use the prompt library in [prompts/](prompts/) to start work with clear boundaries.
-6. Capture project decisions as ADRs and keep the changelog current.
+2. Copy [AGENTS.md](AGENTS.md), [.codex/config.toml](.codex/config.toml), and the needed project-scoped agent definitions from [.codex/agents/](.codex/agents/).
+3. Create a project-specific context file from [PROJECT_CONTEXT.template.md](templates/PROJECT_CONTEXT.template.md).
+4. Review [FRAMEWORK_OVERVIEW.md](docs/FRAMEWORK_OVERVIEW.md) and [ENGINEERING_GUIDE.md](docs/ENGINEERING_GUIDE.md).
+5. Customize agent scope only where the project context requires it.
+6. Use the prompt library in [prompts/](prompts/) to start work with clear boundaries.
+7. Capture project decisions as ADRs and keep the changelog current.
 
 ## Codex Discovery
 
 Codex discovers repository-level operating instructions from [AGENTS.md](AGENTS.md). The primary Codex session should read that file, this README, [FRAMEWORK_OVERVIEW.md](docs/FRAMEWORK_OVERVIEW.md), and relevant project context before making changes.
 
 Project-scoped Codex custom agents are stored in [.codex/agents/](.codex/agents/). These TOML files describe the available specialist roles and their sandbox boundaries.
+
+The default Codex configuration limits agent depth and keeps concurrency conservative. Parallel work should be limited to read-only tasks or clearly non-overlapping write scopes.
 
 ## Invoking Agents
 
