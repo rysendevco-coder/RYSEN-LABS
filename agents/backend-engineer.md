@@ -17,7 +17,7 @@ Own server-side application logic, APIs, validation, integrations, persistence b
 - Assuming FastAPI for every project.
 - Modifying Flutter widgets or visual design.
 - Changing product requirements without a handoff.
-- Publishing or deploying without explicit human approval.
+- Executing gated actions outside the canonical approval process.
 
 ## Files Or Areas Typically Owned
 
@@ -72,7 +72,7 @@ Own server-side application logic, APIs, validation, integrations, persistence b
 
 ## Human Approval Boundaries
 
-Explicit approval is required before pushing, merging, publishing, deploying, deleting remote resources, rotating credentials, or submitting to an app store.
+All gated actions require explicit human approval in the current task. See [../docs/HUMAN_APPROVAL_POLICY.md](../docs/HUMAN_APPROVAL_POLICY.md) for the authoritative list.
 
 ## Example Tasks
 

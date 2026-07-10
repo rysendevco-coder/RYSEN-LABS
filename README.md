@@ -6,7 +6,7 @@ This repository contains the reusable operating framework for that work. It defi
 
 Current maturity: **Version 0.1.0 - Foundation**.
 
-Production deployment always requires explicit human approval.
+All gated actions require explicit human approval in the current task. See the [Human Approval Policy](docs/HUMAN_APPROVAL_POLICY.md) for the authoritative list.
 
 ## What It Solves
 
@@ -18,7 +18,7 @@ AI-assisted development can move quickly, but speed without structure creates dr
 - Preserve human control over production actions.
 - Capture lessons once and reuse them across future projects.
 
-The framework is project-agnostic. It can be adopted by projects such as Pokemon Sniper, Lunch Roulette, future Flutter applications, Python or Java backend systems, and other software products.
+The framework is project-agnostic. It can be adopted by projects such as Pokemon Sniper, Lunch Roulette, future Flutter applications, Python or Java backend systems, and other software products. Example projects are illustrative, not mandatory architecture defaults.
 
 ## Initial Agent Roles
 
@@ -27,6 +27,8 @@ The framework is project-agnostic. It can be adopted by projects such as Pokemon
 - **Flutter Engineer**: owns Flutter and Dart UI, navigation, state management, accessibility, responsive layouts, and frontend tests.
 - **Reviewer**: independently reviews correctness, regressions, security, maintainability, architecture compliance, and missing tests.
 - **Deployment Engineer**: owns release preparation, versioning, changelogs, release checklists, environment documentation, and deployment procedure design.
+
+The initial included frontend specialist is Flutter-focused, but the framework itself is stack-neutral. Projects may replace that role with a web, desktop, Android, iOS, JavaFX, React, Vue, or other project-specific frontend role. Backend roles must follow the selected project context rather than assume Python, FastAPI, Java, Spring, or any other stack.
 
 ## Repository Structure
 
@@ -37,6 +39,7 @@ docs/                    Framework guides, policies, workflows, and ADRs
 prompts/                 Reusable paste-ready Codex task prompts
 templates/               Project and workflow document templates
 examples/                Project-context examples only
+examples/stack-neutral/  Stack-neutral project-context example
 AGENTS.md                Repository-level Codex operating instructions
 CHANGELOG.md             Version history
 CONTRIBUTING.md          Contribution workflow
@@ -53,6 +56,8 @@ README.md                Framework introduction
 5. Customize agent scope only where the project context requires it.
 6. Use the prompt library in [prompts/](prompts/) to start work with clear boundaries.
 7. Capture project decisions as ADRs and keep the changelog current.
+
+See [examples/stack-neutral/PROJECT_CONTEXT.example.md](examples/stack-neutral/PROJECT_CONTEXT.example.md) for a project-context example that does not select a specific stack.
 
 ## Codex Discovery
 
@@ -71,7 +76,7 @@ Invoke agents through a Codex task by naming the required role and providing:
 - Files allowed to change.
 - Files prohibited from changing.
 - Required validation.
-- Human approval boundaries.
+- Human approval boundaries from the [Human Approval Policy](docs/HUMAN_APPROVAL_POLICY.md).
 - Expected final report.
 
 Example: ask the Orchestrator to split a feature request into backend and Flutter tasks, then ask the Backend Engineer and Flutter Engineer to work only on their non-overlapping files. Ask the Reviewer to inspect the result after implementation.
@@ -84,7 +89,7 @@ Example: ask the Orchestrator to split a feature request into backend and Flutte
 4. Run validation required by the project.
 5. Ask the Reviewer for an independent review.
 6. Update docs, changelog, and lessons learned.
-7. Request explicit human approval before any push, merge, publish, deploy, or store submission.
+7. Follow the [Human Approval Policy](docs/HUMAN_APPROVAL_POLICY.md) before any gated action.
 
 ## Improvement Loop
 

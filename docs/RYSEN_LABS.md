@@ -19,3 +19,5 @@ The name is intentionally spelled R-Y-S-E-N.
 ## Operating Model
 
 RYSEN Labs treats AI agents as specialist collaborators. The human developer keeps authority over goals, approvals, priorities, credentials, production actions, and final judgment.
+
+All gated actions follow the canonical [Human Approval Policy](HUMAN_APPROVAL_POLICY.md).

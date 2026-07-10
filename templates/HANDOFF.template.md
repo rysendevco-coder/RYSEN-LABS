@@ -42,7 +42,7 @@ TBD
 
 ## Human Approval Boundaries
 
-Pushing, merging, publishing, creating releases, deploying to production, deleting remote resources, rotating credentials, uploading signing keys, and app-store submission require explicit human approval in the current task.
+All gated actions require explicit human approval in the current task. See [../docs/HUMAN_APPROVAL_POLICY.md](../docs/HUMAN_APPROVAL_POLICY.md) for the authoritative list.
 
 ## Known Risks
 

@@ -22,3 +22,8 @@ This changelog follows a Keep a Changelog-inspired structure.
 - Added approval status and allowed-file fields to handoff guidance.
 - Reduced default agent concurrency to lower the risk of overlapping write-heavy work.
 - Clarified Codex adoption files in the README.
+- Established the Human Approval Policy as the canonical gated-action source.
+- Added required-reading rules to all custom-agent TOML definitions.
+- Expanded project-context and feature-request templates with boundaries and approval status.
+- Documented first-time `main` establishment.
+- Added a stack-neutral project-context example.

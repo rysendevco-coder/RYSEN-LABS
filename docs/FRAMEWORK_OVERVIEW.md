@@ -20,6 +20,8 @@ The framework provides:
 
 It does not provide application code, runtime stacks, databases, Docker configuration, or CI/CD implementations in version 0.1.0.
 
+The framework is stack-neutral. The initial frontend specialist is Flutter-focused because Flutter is one expected project type, but projects may replace that role with a web, desktop, Android, iOS, JavaFX, React, Vue, or other project-specific frontend role. Backend work must follow the active project context rather than assume Python, FastAPI, Java, Spring, or another stack.
+
 ## Roles
 
 - Orchestrator plans and coordinates.
@@ -27,6 +29,8 @@ It does not provide application code, runtime stacks, databases, Docker configur
 - Flutter Engineer owns Flutter client implementation once a project includes Flutter.
 - Reviewer inspects independently.
 - Deployment Engineer prepares release procedures and documentation.
+
+All roles follow the canonical [Human Approval Policy](HUMAN_APPROVAL_POLICY.md) for gated actions.
 
 ## Workflow
 

@@ -25,16 +25,7 @@ Before making changes, the primary Codex session must read:
 
 ## Human Approval Boundaries
 
-Explicit human approval is required before:
-
-- Pushing to a remote.
-- Merging branches.
-- Publishing packages.
-- Creating releases.
-- Deploying to production.
-- Deleting remote resources.
-- Rotating credentials.
-- Submitting to an app store.
+All gated actions require explicit human approval in the current task. See [docs/HUMAN_APPROVAL_POLICY.md](docs/HUMAN_APPROVAL_POLICY.md) for the authoritative list.
 
 ## Final Response
 

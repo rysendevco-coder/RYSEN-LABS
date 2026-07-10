@@ -50,4 +50,4 @@ Report release scope, files changed, validation performed, unresolved risks, app
 
 ## Human Approval Boundaries
 
-Do not push, merge, publish, deploy, delete remote resources, rotate credentials, upload signing keys, or submit to an app store without explicit human approval in the current task.
+Follow [../docs/HUMAN_APPROVAL_POLICY.md](../docs/HUMAN_APPROVAL_POLICY.md). Do not execute any gated action during this prompt unless the user explicitly approves that exact action in the current task. Prior approval from another prompt or conversation does not carry forward. Preparing release notes, manifests, commands, and checklists is allowed when within scope.

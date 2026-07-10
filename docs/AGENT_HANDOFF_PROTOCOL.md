@@ -31,3 +31,4 @@ Use [HANDOFF.template.md](../templates/HANDOFF.template.md) for reusable handoff
 - Preserve approval boundaries even when work is passed between agents.
 - Preserve contract details instead of relying on memory.
 - Escalate unclear, risky, or production-impacting decisions to the human developer.
+- A handoff does not itself grant approval for gated actions. See [HUMAN_APPROVAL_POLICY.md](HUMAN_APPROVAL_POLICY.md).

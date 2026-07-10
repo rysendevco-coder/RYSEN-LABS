@@ -46,4 +46,4 @@ Report files changed, behavior added, validation performed, reviewer findings, r
 
 ## Human Approval Boundaries
 
-Do not push, merge, publish, deploy, delete remote resources, rotate credentials, or submit to an app store without explicit human approval in the current task.
+Follow [../docs/HUMAN_APPROVAL_POLICY.md](../docs/HUMAN_APPROVAL_POLICY.md). Do not execute any gated action during this prompt unless the user explicitly approves that exact action in the current task. Prior approval from another prompt or conversation does not carry forward.

@@ -19,6 +19,8 @@ Every project should begin with a project context document. Use [PROJECT_CONTEXT
 
 Use [AGENT_HANDOFF_PROTOCOL.md](AGENT_HANDOFF_PROTOCOL.md) whenever work moves between roles. A handoff should preserve decisions, risks, contracts, and acceptance criteria.
 
+A handoff does not grant approval for gated actions. Use [HUMAN_APPROVAL_POLICY.md](HUMAN_APPROVAL_POLICY.md) as the canonical approval policy.
+
 ## Review
 
 Review should focus on correctness, architecture, regressions, security, maintainability, tests, and documentation. Style-only feedback should be reserved for cases that affect comprehension or long-term maintainability.

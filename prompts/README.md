@@ -4,6 +4,8 @@ These prompts are reusable starting points for Codex tasks. Copy a prompt, fill 
 
 Use only the agents needed for the task. Do not run all five roles by default.
 
+All prompts follow the canonical [Human Approval Policy](../docs/HUMAN_APPROVAL_POLICY.md). Prior approval from another prompt or conversation does not carry forward.
+
 ## Prompts
 
 - [Project Kickoff](project-kickoff.md)

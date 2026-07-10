@@ -4,6 +4,8 @@ These handbooks describe the human-readable operating boundaries for the five in
 
 The TOML files in [../.codex/agents/](../.codex/agents/) are the project-scoped Codex custom-agent configurations. The handbooks in this directory explain the same responsibilities in a format suitable for planning, review, and onboarding.
 
+All role handbooks follow the canonical [Human Approval Policy](../docs/HUMAN_APPROVAL_POLICY.md).
+
 ## Roles
 
 - [Orchestrator](orchestrator.md)

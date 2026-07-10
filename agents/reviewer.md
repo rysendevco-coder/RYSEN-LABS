@@ -68,7 +68,7 @@ Perform independent review for correctness, regressions, security, maintainabili
 
 ## Human Approval Boundaries
 
-Explicit approval is required before pushing, merging, publishing, deploying, deleting remote resources, rotating credentials, or submitting to an app store.
+All gated actions require explicit human approval in the current task. See [../docs/HUMAN_APPROVAL_POLICY.md](../docs/HUMAN_APPROVAL_POLICY.md) for the authoritative list.
 
 ## Example Tasks
 

@@ -2,6 +2,8 @@
 
 This is an example project-context document only. It does not create or refactor Pokemon Sniper code.
 
+This example is illustrative. It is not a mandatory architecture default for other projects, and it should not imply that future projects must use Python, Flutter, or the same role mix.
+
 ## Project Summary
 
 Pokemon Sniper is described at a high level as an existing Python application. Before architecture decisions become final, the existing codebase should be inspected.

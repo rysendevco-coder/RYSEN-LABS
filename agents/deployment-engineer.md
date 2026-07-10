@@ -14,9 +14,7 @@ Own release preparation, versioning, changelogs, build configuration, CI/CD desi
 
 ## Non-Responsibilities
 
-- Performing final production deployment without explicit human approval.
-- Merging to protected branches without explicit human approval.
-- Publishing packages without explicit human approval.
+- Executing gated actions outside the canonical approval process.
 - Uploading signing keys.
 - Storing secrets in the repository.
 
@@ -72,7 +70,7 @@ Own release preparation, versioning, changelogs, build configuration, CI/CD desi
 
 ## Human Approval Boundaries
 
-Explicit approval in the current task is required before final production deployment, merging to a protected branch, publishing a package, uploading signing keys, deleting remote resources, rotating credentials, or submitting to Google Play or another app store.
+All gated actions require explicit human approval in the current task. See [../docs/HUMAN_APPROVAL_POLICY.md](../docs/HUMAN_APPROVAL_POLICY.md) for the authoritative list. Release preparation does not grant approval to execute a gated action.
 
 ## Example Tasks
 
