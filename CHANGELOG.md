@@ -2,6 +2,12 @@
 
 This changelog follows a Keep a Changelog-inspired structure.
 
+## [Unreleased]
+
+### Added
+
+- Added the `rysen-labs-dashboard` FastAPI project for a read-only ZimaBoard operations dashboard.
+
 ## [0.1.0] - 2026-07-10 - Foundation
 
 ### Added

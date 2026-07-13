@@ -1,0 +1,49 @@
+applications:
+  - name: CasaOS
+    status: unavailable
+    url: http://192.168.50.42
+    description: ZimaBoard home server control plane and app catalog.
+    category: Platform
+    container_names: []
+  - name: Jellyfin
+    status: unavailable
+    url: http://192.168.50.42:8096
+    description: Personal media library and streaming server.
+    category: Media
+    container_names:
+      - jellyfin
+  - name: PhotoPrism
+    status: unavailable
+    url: http://192.168.50.42:2342
+    description: Private photo library, indexing, and browsing.
+    category: Photos
+    container_names:
+      - photoprism
+  - name: PokémonSniper
+    status: unavailable
+    url: http://192.168.50.42:3000
+    description: RYSEN Labs Pokémon card discovery and tracking app.
+    category: Apps
+    container_names:
+      - pokemonsniper
+  - name: MotorMinder
+    status: unavailable
+    url: http://192.168.50.42:8081
+    description: Vehicle service and maintenance record system.
+    category: Apps
+    container_names:
+      - motorminder
+  - name: PBCT Website
+    status: unavailable
+    url: http://192.168.50.42:8082
+    description: Local deployment target for the PBCT website.
+    category: Websites
+    container_names:
+      - pbct-website
+  - name: Rysen Labs Dashboard
+    status: healthy
+    url: http://192.168.50.42:8080
+    description: Read-only operations dashboard for the rysen-labs server.
+    category: Operations
+    container_names:
+      - rysen-labs-dashboard

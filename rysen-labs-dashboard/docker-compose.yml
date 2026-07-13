@@ -1,0 +1,17 @@
+services:
+  rysen-labs-dashboard:
+    build: .
+    container_name: rysen-labs-dashboard
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/apps.yml:/app/config/apps.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
