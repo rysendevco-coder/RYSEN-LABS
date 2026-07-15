@@ -23,7 +23,7 @@ Version 0.3 is a local-only, development-host readiness foundation. Do not deplo
 ## Local Windows Setup
 
 ```powershell
-cd C:\Users\onewi\OneDrive\Documents\RYSEN-LABS\rysen-labs-dashboard
+cd <path-to-repository>\rysen-labs-dashboard
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"

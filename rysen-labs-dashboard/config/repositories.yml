@@ -2,7 +2,7 @@ repositories:
   - id: rysen-labs-dashboard
     name: Rysen Labs Dashboard
     description: Self-hosted operations and development dashboard
-    path: /home/charles/projects/rysen-labs-dashboard
+    path: /repositories/rysen-labs-dashboard
     expected_remote: origin
     default_branch: develop
     category: Infrastructure
