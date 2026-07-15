@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+  </head>
+  <body>
+    <main class="shell" data-update-interval-seconds="{{ update_interval_seconds }}">
+      <header class="masthead">
+        <div>
+          <p class="eyebrow">192.168.50.42 · Debian · Docker · Safe Mode</p>
+          <h1>Rysen Labs Command Center</h1>
+        </div>
+        <div class="status-stack">
+          <div class="server-pill">
+            <span class="pulse" id="connection-pulse"></span>
+            <span id="connection-state">Connecting</span>
+          </div>
+          <span class="timestamp">Updated <time id="last-updated">{{ payload.generated_at }}</time></span>
+        </div>
+      </header>
+
+      <section class="system-banner" aria-label="Server status">
+        <div>
+          <span class="label">Server</span>
+          <strong id="server-name">{{ payload.server.label }}</strong>
+        </div>
+        <div>
+          <span class="label">Safe Mode</span>
+          <strong id="safe-mode">{{ "On" if payload.server.safe_mode else "Off" }}</strong>
+        </div>
+        <div>
+          <span class="label">Docker</span>
+          <strong id="docker">{{ "Online" if payload.docker.available else ("Disabled" if not payload.docker.enabled else "Unavailable") }}</strong>
+        </div>
+      </section>
+
+      <section class="metrics-grid" aria-label="System metrics">
+        <article class="metric"><span>Hostname</span><strong id="hostname">{{ payload.system.hostname }}</strong></article>
+        <article class="metric"><span>Uptime</span><strong id="uptime">{{ payload.system.uptime_human }}</strong></article>
+        <article class="metric"><span>CPU</span><strong id="cpu">{{ payload.system.cpu_percent if payload.system.cpu_percent is not none else "N/A" }}%</strong></article>
+        <article class="metric"><span>Load</span><strong id="load">{{ payload.system.load_average|join(" / ") if payload.system.load_average else "N/A" }}</strong></article>
+        <article class="metric"><span>Memory</span><strong id="memory">{{ payload.system.memory.percent if payload.system.memory.percent is not none else "N/A" }}%</strong></article>
+        <article class="metric"><span>Disk</span><strong id="disk">{{ payload.system.disk.percent if payload.system.disk.percent is not none else "N/A" }}%</strong></article>
+        <article class="metric"><span>CPU Temp</span><strong id="temperature">{{ payload.system.cpu_temperature_c if payload.system.cpu_temperature_c is not none else "Unavailable" }}{% if payload.system.cpu_temperature_c is not none %}°C{% endif %}</strong></article>
+        <article class="metric"><span>Services</span><strong id="service-count">{{ payload.applications|length }}</strong></article>
+        <article class="metric"><span>Repositories</span><strong id="repository-count">{{ payload.repositories|length }}</strong></article>
+      </section>
+
+      <section class="notice" id="config-errors" {% if not payload.config_errors %}hidden{% endif %}>
+        {% for error in payload.config_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </section>
+
+      <section class="section-heading">
+        <h2>Applications</h2>
+        <p id="refresh-note">Live read-only updates every {{ update_interval_seconds }} seconds.</p>
+      </section>
+
+      <section class="app-grid" id="applications" aria-label="Application status">
+        {% for card in payload.applications %}
+        <article class="app-card" data-status="{{ card.health.state }}">
+          <div class="card-topline">
+            <span class="category">{{ card.category }}</span>
+            <span class="status">{{ card.health.state|replace("_", " ") }}</span>
+          </div>
+          <h3>{{ card.name }}</h3>
+          <p>{{ card.description }}</p>
+          <dl class="health-details">
+            <div><dt>Latency</dt><dd>{{ card.health.latency_ms if card.health.latency_ms is not none else "N/A" }}{% if card.health.latency_ms is not none %} ms{% endif %}</dd></div>
+            <div><dt>Source</dt><dd>{{ card.health.source }}</dd></div>
+          </dl>
+          <a href="{{ card.url }}" rel="noreferrer">{{ card.url }}</a>
+        </article>
+        {% endfor %}
+      </section>
+
+      <section class="empty-state" id="empty-state" {% if payload.applications %}hidden{% endif %}>
+        <h2>No applications configured</h2>
+        <p>Add entries to config/apps.yml to populate the command center.</p>
+      </section>
+
+      <section class="section-heading">
+        <h2>Repositories</h2>
+        <p>Read-only Git awareness for configured local projects.</p>
+      </section>
+
+      <section class="repo-grid" id="repositories" aria-label="Repository status">
+        {% for repo in payload.repositories %}
+        <article class="repo-card" data-status="{{ repo.status_class }}">
+          <div class="card-topline">
+            <span class="category">{{ repo.category }}</span>
+            <span class="status">{{ repo.status_class|replace("_", " ") }}</span>
+          </div>
+          <h3>{{ repo.repository_name }}</h3>
+          <p>{{ repo.warning or repo.latest_commit_message or repo.path }}</p>
+          <dl class="health-details">
+            <div><dt>Branch</dt><dd>{{ "Detached" if repo.detached_head else (repo.current_branch or "N/A") }}</dd></div>
+            <div><dt>Commit</dt><dd>{{ repo.short_commit_sha or "N/A" }}</dd></div>
+            <div><dt>Remote</dt><dd>{{ repo.remote_url or "N/A" }}</dd></div>
+            <div><dt>Changes</dt><dd>{{ repo.staged_files }} staged / {{ repo.modified_files }} modified / {{ repo.untracked_files }} untracked</dd></div>
+            <div><dt>Ahead/Behind</dt><dd>{{ repo.ahead_count if repo.ahead_count is not none else "?" }}/{{ repo.behind_count if repo.behind_count is not none else "?" }}</dd></div>
+            <div><dt>Upstream</dt><dd>{{ repo.upstream_branch or "N/A" }}</dd></div>
+          </dl>
+        </article>
+        {% endfor %}
+      </section>
+
+      <section class="empty-state" id="repositories-empty-state" {% if payload.repositories %}hidden{% endif %}>
+        <h2>No repositories inspected</h2>
+        <p>Set ENABLE_GIT_INTEGRATION=true and configure config/repositories.yml to enable read-only repository status.</p>
+      </section>
+    </main>
+    <script src="{{ url_for('static', path='/app.js') }}"></script>
+  </body>
+</html>

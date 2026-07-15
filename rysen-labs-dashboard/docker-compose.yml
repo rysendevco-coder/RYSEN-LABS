@@ -1,0 +1,35 @@
+services:
+  rysen-labs-dashboard:
+    build: .
+    container_name: rysen-labs-dashboard
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DASHBOARD_PORT: ${DASHBOARD_PORT:-8080}
+      ENABLE_DOCKER_INTEGRATION: ${ENABLE_DOCKER_INTEGRATION:-false}
+      ENABLE_GIT_INTEGRATION: ${ENABLE_GIT_INTEGRATION:-false}
+      REPOSITORIES_CONFIG_PATH: ${REPOSITORIES_CONFIG_PATH:-config/repositories.yml}
+      GIT_COMMAND_TIMEOUT_SECONDS: ${GIT_COMMAND_TIMEOUT_SECONDS:-5}
+      GIT_MAX_REPOSITORIES: ${GIT_MAX_REPOSITORIES:-}
+      GIT_SCAN_CACHE_SECONDS: ${GIT_SCAN_CACHE_SECONDS:-15}
+      SAFE_MODE: ${SAFE_MODE:-true}
+    ports:
+      - "${DASHBOARD_PORT:-8080}:8080"
+    volumes:
+      - ./config/apps.yml:/app/config/apps.yml:ro
+      - ./config/repositories.yml:/app/config/repositories.yml:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3).read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

@@ -1,0 +1,100 @@
+# Rysen Labs Dashboard application registry.
+# Entries marked as examples may need container names, ports, or health URLs adjusted
+# after the ZimaBoard filesystem is healthy and services are confirmed.
+applications:
+  - id: casaos
+    name: CasaOS
+    description: ZimaBoard home server control plane and app catalog.
+    category: Platform
+    icon: layout-dashboard
+    url: http://192.168.50.42
+    internal_health_url: http://192.168.50.42
+    expected_port: 80
+    enabled: true
+    health_check_enabled: false
+    timeout_seconds: 2
+    display_order: 10
+
+  - id: jellyfin-example
+    name: Jellyfin
+    description: Example media library card. Enable health checks after deployment is confirmed.
+    category: Media
+    icon: film
+    url: http://192.168.50.42:8096
+    internal_health_url: http://192.168.50.42:8096/health
+    container_name: jellyfin
+    expected_port: 8096
+    enabled: true
+    health_check_enabled: false
+    timeout_seconds: 2
+    display_order: 20
+
+  - id: photoprism-example
+    name: PhotoPrism
+    description: Example private photo library card. Container details may need adjustment.
+    category: Photos
+    icon: image
+    url: http://192.168.50.42:2342
+    internal_health_url: http://192.168.50.42:2342
+    container_name: photoprism
+    expected_port: 2342
+    enabled: true
+    health_check_enabled: false
+    timeout_seconds: 2
+    display_order: 30
+
+  - id: pokemonsniper-example
+    name: PokemonSniper
+    description: Example RYSEN Labs Pokemon card discovery app entry. Not assumed deployed.
+    category: Apps
+    icon: target
+    url: http://192.168.50.42:3000
+    internal_health_url: http://192.168.50.42:3000/health
+    container_name: pokemonsniper
+    expected_port: 3000
+    enabled: false
+    health_check_enabled: false
+    timeout_seconds: 2
+    display_order: 40
+
+  - id: motorminder-example
+    name: MotorMinder
+    description: Example vehicle service and maintenance app entry. Not assumed deployed.
+    category: Apps
+    icon: wrench
+    url: http://192.168.50.42:8081
+    internal_health_url: http://192.168.50.42:8081/health
+    container_name: motorminder
+    expected_port: 8081
+    enabled: false
+    health_check_enabled: false
+    timeout_seconds: 2
+    display_order: 50
+
+  - id: pbct-website-example
+    name: PBCT Website
+    description: Example local PBCT website deployment target. Not assumed deployed.
+    category: Websites
+    icon: globe
+    url: http://192.168.50.42:8082
+    internal_health_url: http://192.168.50.42:8082
+    container_name: pbct-website
+    expected_port: 8082
+    enabled: false
+    health_check_enabled: false
+    timeout_seconds: 2
+    display_order: 60
+
+  - id: rysen-labs-dashboard
+    name: Rysen Labs Dashboard
+    description: Read-only operations dashboard for the rysen-labs server.
+    category: Operations
+    icon: activity
+    url: http://192.168.50.42:8080
+    internal_health_url: http://127.0.0.1:8080/health
+    container_name: rysen-labs-dashboard
+    expected_port: 8080
+    enabled: true
+    health_check_enabled: false
+    timeout_seconds: 2
+    display_order: 70

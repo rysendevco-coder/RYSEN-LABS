@@ -1,0 +1,6 @@
+services:
+  rysen-labs-dashboard:
+    environment:
+      ENABLE_DOCKER_INTEGRATION: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
