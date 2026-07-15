@@ -1,87 +1,40 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
-from app.config import AppCard, get_settings, load_app_cards
+from app.config import get_settings
 from app.logging_config import configure_logging
-from app.services.docker_status import collect_docker_status, health_state_for_app
-from app.services.system_metrics import collect_system_metrics
+from app.routes import dashboard, health, realtime, status
 
-
-configure_logging()
 
 APP_DIR = Path(__file__).resolve().parent
-templates = Jinja2Templates(directory=str(APP_DIR / "templates"))
-
-app = FastAPI(title="Rysen Labs Command Center", version="0.1.0")
-app.mount("/static", StaticFiles(directory=str(APP_DIR / "static")), name="static")
 
 
-def _cards_with_status(cards: list[AppCard]) -> list[dict[str, object]]:
-    docker_snapshot = collect_docker_status()
-    return [
-        {
-            "name": card.name,
-            "status": health_state_for_app(card.container_names, docker_snapshot, card.status),
-            "url": card.url,
-            "description": card.description,
-            "category": card.category,
-        }
-        for card in cards
-    ]
-
-
-def build_status_payload() -> dict[str, object]:
+def create_app() -> FastAPI:
     settings = get_settings()
-    system = collect_system_metrics()
-    docker_snapshot = collect_docker_status()
-    cards = load_app_cards(settings.apps_config_path)
-    applications = [
-        {
-            "name": card.name,
-            "status": health_state_for_app(card.container_names, docker_snapshot, card.status),
-            "url": card.url,
-            "description": card.description,
-            "category": card.category,
-        }
-        for card in cards
-    ]
-    return {
-        "server": {
-            "label": settings.host_label,
-            "ip": settings.server_ip,
-        },
-        "system": system.to_dict(),
-        "docker": docker_snapshot.to_dict(),
-        "applications": applications,
-    }
-
-
-@app.get("/", response_class=HTMLResponse)
-def dashboard(request: Request) -> HTMLResponse:
-    settings = get_settings()
-    payload = build_status_payload()
-    return templates.TemplateResponse(
-        request,
-        "dashboard.html",
-        {
-            "title": "Rysen Labs Command Center",
-            "refresh_seconds": settings.refresh_seconds,
-            "payload": payload,
+    configure_logging(settings.log_level)
+    logger = logging.getLogger(__name__)
+    logger.info(
+        "dashboard_startup",
+        extra={
+            "event": "dashboard_startup",
+            "safe_mode": settings.safe_mode,
+            "docker_enabled": settings.enable_docker_integration,
+            "git_enabled": settings.enable_git_integration,
         },
     )
 
+    app = FastAPI(title="Rysen Labs Command Center", version="0.3.0")
+    app.mount("/static", StaticFiles(directory=str(APP_DIR / "static")), name="static")
+    app.include_router(dashboard.router)
+    app.include_router(status.router)
+    app.include_router(health.router)
+    app.include_router(realtime.router)
+    return app
 
-@app.get("/api/status")
-def api_status() -> dict[str, object]:
-    return build_status_payload()
 
-
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok", "service": "rysen-labs-dashboard"}
+app = create_app()

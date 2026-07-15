@@ -1,0 +1,8 @@
+services:
+  rysen-labs-dashboard:
+    environment:
+      ENABLE_GIT_INTEGRATION: "true"
+      REPOSITORIES_CONFIG_PATH: /app/config/repositories.yml
+    volumes:
+      - ./config/repositories.yml:/app/config/repositories.yml:ro
+      - /path/to/local/repositories:/repositories:ro

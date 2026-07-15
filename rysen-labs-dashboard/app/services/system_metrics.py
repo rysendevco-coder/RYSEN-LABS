@@ -5,48 +5,37 @@ import os
 import platform
 import socket
 import time
-from dataclasses import asdict, dataclass
-from typing import Any
 
 import psutil
 
+from app.models.schemas import SystemMetrics, Usage
+
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class Usage:
-    percent: float | None
-    used_gb: float | None = None
-    total_gb: float | None = None
-
-
-@dataclass
-class SystemMetrics:
-    hostname: str
-    uptime_seconds: int | None
-    cpu_percent: float | None
-    load_average: list[float] | None
-    memory: Usage
-    disk: Usage
-    cpu_temperature_c: float | None
-    unavailable: list[str]
-
-    def to_dict(self) -> dict[str, Any]:
-        payload = asdict(self)
-        payload["uptime_human"] = format_uptime(self.uptime_seconds)
-        return payload
 
 
 def _gb(value: int | float) -> float:
     return round(float(value) / 1024 / 1024 / 1024, 1)
 
 
+def format_uptime(seconds: int | None) -> str:
+    if seconds is None:
+        return "Unavailable"
+    days, remainder = divmod(seconds, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, _ = divmod(remainder, 60)
+    if days:
+        return f"{days}d {hours}h {minutes}m"
+    if hours:
+        return f"{hours}h {minutes}m"
+    return f"{minutes}m"
+
+
 def _cpu_temperature() -> float | None:
     try:
         sensors = psutil.sensors_temperatures(fahrenheit=False)
-    except (AttributeError, OSError) as exc:
-        logger.info("cpu_temperature_unavailable", exc_info=exc)
+    except (AttributeError, OSError):
+        logger.info("cpu_temperature_unavailable", extra={"event": "cpu_temperature_unavailable"})
         return None
 
     preferred_labels = ("coretemp", "k10temp", "cpu_thermal", "acpitz")
@@ -63,47 +52,33 @@ def _cpu_temperature() -> float | None:
     return None
 
 
-def format_uptime(seconds: int | None) -> str:
-    if seconds is None:
-        return "Unavailable"
-    days, remainder = divmod(seconds, 86400)
-    hours, remainder = divmod(remainder, 3600)
-    minutes, _ = divmod(remainder, 60)
-    if days:
-        return f"{days}d {hours}h {minutes}m"
-    if hours:
-        return f"{hours}h {minutes}m"
-    return f"{minutes}m"
-
-
 def collect_system_metrics() -> SystemMetrics:
     unavailable: list[str] = []
 
     try:
         hostname = socket.gethostname()
-    except OSError as exc:
-        logger.warning("hostname_unavailable", exc_info=exc)
+    except OSError:
+        logger.warning("hostname_unavailable", extra={"event": "hostname_unavailable"})
         hostname = platform.node() or "unknown"
         unavailable.append("hostname")
 
     try:
         uptime_seconds = int(time.time() - psutil.boot_time())
-    except OSError as exc:
-        logger.warning("uptime_unavailable", exc_info=exc)
+    except OSError:
+        logger.warning("uptime_unavailable", extra={"event": "uptime_unavailable"})
         uptime_seconds = None
         unavailable.append("uptime")
 
     try:
         cpu_percent = round(psutil.cpu_percent(interval=0.1), 1)
-    except OSError as exc:
-        logger.warning("cpu_usage_unavailable", exc_info=exc)
+    except OSError:
+        logger.warning("cpu_usage_unavailable", extra={"event": "cpu_usage_unavailable"})
         cpu_percent = None
         unavailable.append("cpu")
 
     try:
         load_average = [round(value, 2) for value in os.getloadavg()]
-    except (AttributeError, OSError) as exc:
-        logger.info("load_average_unavailable", exc_info=exc)
+    except (AttributeError, OSError):
         load_average = None
         unavailable.append("load_average")
 
@@ -114,8 +89,8 @@ def collect_system_metrics() -> SystemMetrics:
             used_gb=_gb(memory_stats.used),
             total_gb=_gb(memory_stats.total),
         )
-    except OSError as exc:
-        logger.warning("memory_unavailable", exc_info=exc)
+    except OSError:
+        logger.warning("memory_unavailable", extra={"event": "memory_unavailable"})
         memory = Usage(percent=None)
         unavailable.append("memory")
 
@@ -126,8 +101,8 @@ def collect_system_metrics() -> SystemMetrics:
             used_gb=_gb(disk_stats.used),
             total_gb=_gb(disk_stats.total),
         )
-    except OSError as exc:
-        logger.warning("disk_unavailable", exc_info=exc)
+    except OSError:
+        logger.warning("disk_unavailable", extra={"event": "disk_unavailable"})
         disk = Usage(percent=None)
         unavailable.append("disk")
 
@@ -138,6 +113,7 @@ def collect_system_metrics() -> SystemMetrics:
     return SystemMetrics(
         hostname=hostname,
         uptime_seconds=uptime_seconds,
+        uptime_human=format_uptime(uptime_seconds),
         cpu_percent=cpu_percent,
         load_average=load_average,
         memory=memory,
