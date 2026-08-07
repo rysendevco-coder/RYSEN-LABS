@@ -1,0 +1,84 @@
+name: Sprint 01 - Ship Something
+start_date: 2026-08-10
+end_date: 2026-08-23
+date_label: Aug 10 - Aug 23, 2026
+primary_objective: Move Rip or Vault materially toward a stable MVP/release candidate while establishing a clean implementation starting point for MotorMinder, a publish-ready path for PBCT, and completing the initial Rysen Labs sprint dashboard.
+revenue_goal:
+  name: "Rysen Labs Goal #1"
+  description: First $1 of recurring software revenue
+
+tasks:
+  - id: rov-001
+    project: rip-or-vault
+    name: Complete barcode scanner checkpoint
+    description: Complete and validate barcode-based sealed-product identification including exact matches, ambiguous variants, invalid/not-found handling, manual fallback, and mobile scanner behavior.
+    points: 5
+    status: done
+    notes: This checkpoint has already been implemented. Backend and Flutter scanner work is complete and should count toward Sprint 01 progress.
+
+  - id: rov-002
+    project: rip-or-vault
+    name: Stabilize Rip or Vault core evaluation flow
+    description: Validate the full primary user path from product selection through catalog metadata, pricing, quantity input, evaluation, and result presentation. Fix only issues that interfere with normal MVP use.
+    points: 6
+    status: in_progress
+    notes: Keep scope focused on the existing Rip or Vault experience rather than adding unrelated features.
+
+  - id: rov-003
+    project: rip-or-vault
+    name: Close MVP catalog and product-data gaps
+    description: Address the highest-impact missing catalog metadata, pricing-source information, images/placeholders, and product-detail consistency required for normal MVP testing.
+    points: 5
+    status: todo
+    notes: Do not attempt to build a perfect universal Pokemon product database during this sprint.
+
+  - id: rov-004
+    project: rip-or-vault
+    name: Define and execute Rip or Vault release-candidate checklist
+    description: Create a concrete release-candidate checklist covering core workflows, testing, known acceptable limitations, crash/error behavior, and readiness for broader user testing.
+    points: 5
+    status: todo
+
+  - id: mm-001
+    project: motorminder
+    name: Confirm MotorMinder mobile MVP starting point
+    description: Review the existing MotorMinder APEX assets, database model, PRD v2 direction, and Flutter architecture plan and document the exact first mobile implementation slice.
+    points: 3
+    status: todo
+    notes: Do not begin a broad Flutter rebuild during Sprint 01.
+
+  - id: mm-002
+    project: motorminder
+    name: Define Flutter-to-backend API boundary
+    description: Document the first API contract needed by the Flutter client for the initial consumer vehicle/service-history experience, while keeping APEX as backend/admin.
+    points: 2
+    status: todo
+
+  - id: pbct-001
+    project: pbct
+    name: Audit PBCT website for publish readiness
+    description: Review the existing Home, About/Mission, Builds, Turbo Devotionals, Merch Preview, Mission Support, and Contact/Signup experience and identify specific blockers to a credible public launch.
+    points: 3
+    status: todo
+
+  - id: pbct-002
+    project: pbct
+    name: Build PBCT launch content checklist
+    description: Produce the concrete content/assets checklist needed for launch, including required copy, imagery, devotional/build content, signup/contact requirements, and any export/deployment cleanup.
+    points: 2
+    status: todo
+
+  - id: infra-001
+    project: rysen-labs-infrastructure
+    name: Add sprint command center to dashboard
+    description: Implement version-controlled sprint data, calculated project progress, project cards, Needs Attention, and revenue-goal visibility in the existing Rysen Labs dashboard.
+    points: 4
+    status: done
+    notes: Initial implementation complete with test coverage.
+
+  - id: infra-002
+    project: rysen-labs-infrastructure
+    name: Validate Sprint 01 dashboard on live Rysen Labs environment
+    description: Verify the sprint dashboard renders correctly in the normal Rysen Labs environment and that changing a roadmap task status updates calculated progress as expected.
+    points: 1
+    status: todo

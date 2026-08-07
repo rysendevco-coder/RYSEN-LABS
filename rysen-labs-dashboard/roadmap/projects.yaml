@@ -1,0 +1,24 @@
+projects:
+  - id: rip-or-vault
+    name: Rip or Vault / Collector Command Center
+    short_name: RIP OR VAULT
+    description: Collector-focused MVP and release-candidate work.
+    display_order: 10
+
+  - id: motorminder
+    name: MotorMinder
+    short_name: MOTORMINDER
+    description: Vehicle maintenance and service tracking.
+    display_order: 20
+
+  - id: pbct
+    name: Powered by Christ & Turbos
+    short_name: PBCT
+    description: Website and project presence for Powered by Christ & Turbos.
+    display_order: 30
+
+  - id: rysen-labs-infrastructure
+    name: Rysen Labs Infrastructure
+    short_name: RYSEN LABS
+    description: Local infrastructure, dashboard, deployment, and operating system work.
+    display_order: 40

@@ -2,6 +2,8 @@
   const shell = document.querySelector(".shell");
   const applications = document.querySelector("#applications");
   const repositories = document.querySelector("#repositories");
+  const sprintProjects = document.querySelector("#sprint-projects");
+  const needsAttention = document.querySelector("#needs-attention");
   const emptyState = document.querySelector("#empty-state");
   const repositoriesEmptyState = document.querySelector("#repositories-empty-state");
   const configErrors = document.querySelector("#config-errors");
@@ -128,6 +130,75 @@
     }
   }
 
+  function renderSprint(sprint) {
+    if (!sprint || !sprintProjects) return;
+    updateText("sprint-name", sprint.name);
+    updateText("sprint-objective", sprint.primary_objective);
+    updateText("revenue-goal-name", sprint.revenue_goal.name);
+    updateText("revenue-goal-description", sprint.revenue_goal.description);
+    updateText("sprint-progress-label", `${sprint.progress.progress_percentage}%`);
+    const sprintBar = document.getElementById("sprint-progress-bar");
+    if (sprintBar) sprintBar.style.width = `${sprint.progress.progress_percentage}%`;
+
+    sprintProjects.replaceChildren();
+    for (const project of sprint.projects) {
+      const article = document.createElement("article");
+      article.className = "sprint-card";
+      article.dataset.status = project.status;
+
+      const topline = document.createElement("div");
+      topline.className = "card-topline";
+      topline.append(
+        createTextElement("span", "category", project.short_name),
+        createTextElement("span", "status", project.status),
+      );
+
+      const track = document.createElement("div");
+      track.className = "progress-track";
+      const bar = document.createElement("span");
+      bar.style.width = `${project.progress.progress_percentage}%`;
+      track.append(bar);
+
+      const details = document.createElement("dl");
+      details.className = "health-details";
+      for (const [label, value] of [
+        ["Progress", `${project.progress.progress_percentage}%`],
+        ["Points", `${project.progress.completed_points} / ${project.progress.total_points}`],
+      ]) {
+        const group = document.createElement("div");
+        group.append(createTextElement("dt", "", label), createTextElement("dd", "", value));
+        details.append(group);
+      }
+
+      article.append(
+        topline,
+        createTextElement("h3", "", project.name),
+        createTextElement("p", "", project.current_focus),
+        track,
+        details,
+      );
+      sprintProjects.append(article);
+    }
+
+    if (!needsAttention) return;
+    needsAttention.replaceChildren();
+    if (sprint.needs_attention.length === 0) {
+      needsAttention.append(createTextElement("p", "quiet-state", "No active blockers"));
+      return;
+    }
+    for (const task of sprint.needs_attention) {
+      const item = document.createElement("article");
+      item.className = "attention-item";
+      item.dataset.status = task.status;
+      item.append(
+        createTextElement("span", "status", task.status.replaceAll("_", " ")),
+        createTextElement("strong", "", task.name),
+        createTextElement("p", "", task.blocker || task.description),
+      );
+      needsAttention.append(item);
+    }
+  }
+
   function renderConfigErrors(errors) {
     configErrors.replaceChildren();
     configErrors.hidden = errors.length === 0;
@@ -151,6 +222,7 @@
     updateText("repository-count", String((payload.repositories || []).length));
     updateText("last-updated", formatTime(payload.generated_at));
     renderConfigErrors(payload.config_errors || []);
+    renderSprint(payload.sprint);
     renderApplications(payload.applications);
     renderRepositories(payload.repositories || []);
     window.clearTimeout(staleTimer);

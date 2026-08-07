@@ -15,6 +15,7 @@ Version 0.3 is a local-only, development-host readiness foundation. Do not deplo
 - `app/services/app_registry.py` loads and validates `config/apps.yml`.
 - `app/services/repository_registry.py` loads and validates `config/repositories.yml`.
 - `app/services/git_service.py` performs read-only Git repository inspection when enabled.
+- `app/services/sprint_service.py` loads roadmap YAML and calculates point-weighted sprint progress.
 - `app/services/health_checks.py` runs safe concurrent per-app HTTP checks.
 - `app/services/status_service.py` assembles the dashboard payload.
 - `app/realtime/sse.py` formats Server-Sent Events.
@@ -101,6 +102,40 @@ Repository inspection is strictly read-only. It uses Git status commands only an
 
 Ahead/behind counts are relative to the locally known upstream state. The dashboard does not run `git fetch`, so it cannot know whether GitHub or another remote has newer commits until something else updates the local remote-tracking refs.
 
+## Sprint Roadmap Data
+
+Sprint data lives in:
+
+```text
+roadmap/
+  projects.yaml
+  current_sprint.yaml
+  history/
+```
+
+Edit `roadmap/current_sprint.yaml` to update tasks. Each task supports:
+
+- `id`
+- `project`
+- `name`
+- `description`
+- `points`
+- `status`
+- optional `blocker`
+- optional `notes`
+
+Supported statuses are `todo`, `in_progress`, `blocked`, and `done`.
+
+Progress is calculated by the backend from sprint points:
+
+```text
+completed_points / total_points * 100
+```
+
+Only `done` tasks count as completed. Blocked work appears in Needs Attention and does not count as completed.
+
+To start a new sprint, copy the previous `roadmap/current_sprint.yaml` into `roadmap/history/`, then edit `current_sprint.yaml` with the new sprint name, date range, objective, and task list. See `docs/SPRINT_SYSTEM.md`.
+
 ## Environment Variables
 
 - `HOST_LABEL`: display label, default `rysen-labs`.
@@ -125,6 +160,8 @@ Ahead/behind counts are relative to the locally known upstream state. The dashbo
 - `GET /` - dashboard UI.
 - `GET /api/status` - read-only JSON payload.
 - `GET /api/repositories` - read-only repository status list.
+- `GET /api/sprint` - current sprint summary, project progress, blockers, and needs-attention tasks.
+- `GET /api/projects` - project-level sprint summaries.
 - `GET /api/events` - Server-Sent Events stream.
 - `GET /health` - container and service health endpoint.
 

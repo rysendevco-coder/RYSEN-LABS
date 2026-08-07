@@ -132,7 +132,8 @@ h1 {
 
 .metrics-grid,
 .app-grid,
-.repo-grid {
+.repo-grid,
+.sprint-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
@@ -141,6 +142,10 @@ h1 {
 .metric,
 .app-card,
 .repo-card,
+.sprint-panel,
+.sprint-card,
+.goal-card,
+.attention-item,
 .notice,
 .empty-state {
   border: 1px solid var(--line);
@@ -176,9 +181,100 @@ h1 {
 }
 
 .app-card,
-.repo-card {
+.repo-card,
+.sprint-card {
   min-height: 218px;
   padding: 15px;
+}
+
+.sprint-panel {
+  padding: 15px;
+}
+
+.sprint-header {
+  display: grid;
+  gap: 14px;
+}
+
+.sprint-header h2 {
+  margin: 8px 0;
+  font-size: 1.55rem;
+}
+
+.sprint-header p,
+.attention-item p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.goal-card {
+  padding: 14px;
+  min-height: 96px;
+}
+
+.goal-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.15rem;
+}
+
+.progress-block {
+  margin: 18px 0;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-2);
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+}
+
+.sprint-card {
+  min-height: 190px;
+}
+
+.sprint-card .progress-track {
+  margin: 16px 0;
+}
+
+.attention-panel {
+  margin-top: 18px;
+}
+
+.attention-panel h3 {
+  margin: 0 0 10px;
+}
+
+.attention-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.attention-item + .attention-item {
+  margin-top: 10px;
+}
+
+.quiet-state {
+  margin: 0;
+  color: var(--muted);
 }
 
 .card-topline,
@@ -200,6 +296,7 @@ h1 {
 
 .app-card[data-status="healthy"] .status,
 .repo-card[data-status="healthy"] .status,
+.sprint-card[data-status="Complete"] .status,
 .app-card[data-status="container_running"] .status {
   color: #07100f;
   background: var(--green);
@@ -207,6 +304,7 @@ h1 {
 
 .app-card[data-status="configured"] .status,
 .app-card[data-status="unknown"] .status,
+.sprint-card[data-status="On Track"] .status,
 .repo-card[data-status="ahead"] .status,
 .repo-card[data-status="behind"] .status {
   color: #071019;
@@ -214,6 +312,7 @@ h1 {
 }
 
 .app-card[data-status="degraded"] .status,
+.sprint-card[data-status="In Progress"] .status,
 .repo-card[data-status="dirty"] .status,
 .repo-card[data-status="diverged"] .status,
 .repo-card[data-status="detached"] .status {
@@ -222,6 +321,8 @@ h1 {
 }
 
 .app-card[data-status="unhealthy"] .status,
+.sprint-card[data-status="Blocked"] .status,
+.attention-item[data-status="blocked"] .status,
 .app-card[data-status="container_stopped"] .status,
 .app-card[data-status="unavailable"] .status,
 .repo-card[data-status="conflicted"] .status,
@@ -281,8 +382,13 @@ h1 {
 @media (min-width: 520px) {
   .metrics-grid,
   .app-grid,
-  .repo-grid {
+  .repo-grid,
+  .sprint-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sprint-header {
+    grid-template-columns: 1fr minmax(220px, 320px);
   }
 }
 
@@ -296,7 +402,8 @@ h1 {
   }
 
   .app-grid,
-  .repo-grid {
+  .repo-grid,
+  .sprint-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }

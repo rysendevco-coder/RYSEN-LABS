@@ -9,6 +9,7 @@ This changelog follows a Keep a Changelog-inspired structure.
 - Added the `rysen-labs-dashboard` FastAPI project for a read-only ZimaBoard operations dashboard.
 - Prepared `rysen-labs-dashboard` v0.2 with service-oriented backend modules, typed models, SSE live updates, per-app health checks, environment feature flags, hardened Docker defaults, expanded tests, and project status documentation.
 - Prepared `rysen-labs-dashboard` v0.3 with optional read-only Git repository inspection, a repository registry, repository status cards, Docker image Git support, cached Git scans, a repositories API, safe repository mount guidance, and expanded validation coverage.
+- Added the first Rysen Labs Project/Sprint Command Center with YAML roadmap files, point-weighted sprint progress, `/api/sprint`, `/api/projects`, dashboard sprint cards, needs-attention tracking, and sprint system documentation.
 
 ## [0.1.0] - 2026-07-10 - Foundation
 

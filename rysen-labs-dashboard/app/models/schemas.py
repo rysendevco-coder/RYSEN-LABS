@@ -33,6 +33,20 @@ class RepositoryStatusClass(StrEnum):
     DISABLED = "disabled"
 
 
+class SprintTaskStatus(StrEnum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    BLOCKED = "blocked"
+    DONE = "done"
+
+
+class ProjectSprintStatus(StrEnum):
+    ON_TRACK = "On Track"
+    IN_PROGRESS = "In Progress"
+    BLOCKED = "Blocked"
+    COMPLETE = "Complete"
+
+
 class Usage(BaseModel):
     percent: float | None
     used_gb: float | None = None
@@ -127,6 +141,90 @@ class RepositoryConfig(BaseModel):
         return value.expanduser().resolve(strict=False)
 
 
+class ProjectConfig(BaseModel):
+    id: str
+    name: str
+    short_name: str
+    description: str = ""
+    display_order: int = 100
+
+    @field_validator("id")
+    @classmethod
+    def id_is_slug(cls, value: str) -> str:
+        cleaned = value.strip().lower()
+        if not cleaned:
+            raise ValueError("id cannot be empty")
+        if any(char for char in cleaned if not (char.isalnum() or char in {"-", "_"})):
+            raise ValueError("id must contain only letters, numbers, hyphens, or underscores")
+        return cleaned
+
+
+class SprintTask(BaseModel):
+    id: str
+    project: str
+    name: str
+    description: str
+    points: int = Field(ge=0)
+    status: SprintTaskStatus
+    blocker: str | None = None
+    notes: str | None = None
+
+    @field_validator("id", "project")
+    @classmethod
+    def slug_fields(cls, value: str) -> str:
+        cleaned = value.strip().lower()
+        if not cleaned:
+            raise ValueError("value cannot be empty")
+        if any(char for char in cleaned if not (char.isalnum() or char in {"-", "_"})):
+            raise ValueError("value must contain only letters, numbers, hyphens, or underscores")
+        return cleaned
+
+
+class TaskCounts(BaseModel):
+    todo: int = 0
+    in_progress: int = 0
+    blocked: int = 0
+    done: int = 0
+
+
+class SprintProgress(BaseModel):
+    total_points: int
+    completed_points: int
+    progress_percentage: float
+    task_counts: TaskCounts
+
+
+class ProjectSprintSummary(BaseModel):
+    id: str
+    name: str
+    short_name: str
+    description: str = ""
+    status: ProjectSprintStatus
+    current_focus: str
+    blockers: list[SprintTask] = Field(default_factory=list)
+    tasks: list[SprintTask] = Field(default_factory=list)
+    progress: SprintProgress
+    display_order: int = 100
+
+
+class SprintRevenueGoal(BaseModel):
+    name: str
+    description: str
+
+
+class SprintSummary(BaseModel):
+    name: str
+    start_date: str
+    end_date: str
+    date_label: str
+    primary_objective: str
+    revenue_goal: SprintRevenueGoal
+    projects: list[ProjectSprintSummary]
+    needs_attention: list[SprintTask]
+    progress: SprintProgress
+    config_errors: list[str] = Field(default_factory=list)
+
+
 class RepositoryStatus(BaseModel):
     configured: bool = True
     enabled: bool
@@ -194,6 +292,7 @@ class DashboardStatus(BaseModel):
     docker: DockerSnapshot
     applications: list[ApplicationCard]
     repositories: list[RepositoryStatus] = Field(default_factory=list)
+    sprint: SprintSummary | None = None
     generated_at: datetime
     update_interval_seconds: int
     config_errors: list[str] = Field(default_factory=list)

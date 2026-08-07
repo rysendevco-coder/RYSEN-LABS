@@ -9,6 +9,7 @@ from app.services.app_registry import AppRegistry
 from app.services.docker_service import DockerService
 from app.services.git_service import GitRepositoryService
 from app.services.health_checks import check_applications
+from app.services.sprint_service import SprintService
 from app.services.system_metrics import collect_system_metrics
 
 
@@ -18,12 +19,15 @@ class StatusService:
         self.registry = AppRegistry(settings.apps_config_path)
         self.docker = DockerService(settings)
         self.git = GitRepositoryService(settings)
+        self.sprint = SprintService(settings)
 
     async def dashboard_status(self) -> DashboardStatus:
         apps, config_errors = self.registry.load()
         docker_snapshot = self.docker.snapshot()
         repositories, repository_errors = await asyncio.to_thread(self.git.snapshot)
         config_errors.extend(repository_errors)
+        sprint = await asyncio.to_thread(self.sprint.load_sprint)
+        config_errors.extend(sprint.config_errors)
         system = collect_system_metrics()
         health = await check_applications(
             apps,
@@ -55,6 +59,7 @@ class StatusService:
             docker=docker_snapshot,
             applications=cards,
             repositories=repositories,
+            sprint=sprint,
             generated_at=datetime.now(timezone.utc),
             update_interval_seconds=self.settings.update_interval_seconds,
             config_errors=config_errors,
