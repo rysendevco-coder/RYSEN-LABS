@@ -123,6 +123,7 @@ Edit `roadmap/current_sprint.yaml` to update tasks. Each task supports:
 - `status`
 - optional `blocker`
 - optional `notes`
+- optional `checkpoints`
 
 Supported statuses are `todo`, `in_progress`, `blocked`, and `done`.
 
@@ -133,6 +134,10 @@ completed_points / total_points * 100
 ```
 
 Only `done` tasks count as completed. Blocked work appears in Needs Attention and does not count as completed.
+
+If a task has checkpoints, checkpoint points must sum to the parent task points and progress is calculated from completed checkpoint points. Schedule health is calculated centrally by the backend from actual progress versus expected linear progress across the sprint date range.
+
+Use `scripts/update_sprint.py` for explicit, safe task/checkpoint status updates. See `docs/SPRINT_SYNC.md` for the standard sprint update contract.
 
 To start a new sprint, copy the previous `roadmap/current_sprint.yaml` into `roadmap/history/`, then edit `current_sprint.yaml` with the new sprint name, date range, objective, and task list. See `docs/SPRINT_SYSTEM.md`.
 

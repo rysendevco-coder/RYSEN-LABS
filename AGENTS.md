@@ -23,6 +23,20 @@ Before making changes, the primary Codex session must read:
 - Never expose or commit secrets.
 - Update documentation and [CHANGELOG.md](CHANGELOG.md) when behavior or framework structure changes.
 
+## Rysen Labs Sprint Standard
+
+- Follow AGENTS.md and the Rysen Labs sprint-reporting standards.
+- Sprint progress is determined from task/checkpoint points.
+- Agents must not invent arbitrary project-completion percentages.
+- Meaningful completed work should produce a machine-readable `sprint_update` report.
+- `sprint_update` should identify: `project`, `task`, optional `checkpoint`, `result`, `evidence`, and `recommendation`.
+- Include objective evidence when relevant: tests, validation, coverage measurements, commits, build results, or other measurable outcomes.
+- Agents may recommend a task/checkpoint status change, but the sprint engine remains the source of truth for calculated progress.
+- Do not modify sprint state unless explicitly authorized.
+- Do not commit, push, or deploy unless explicitly authorized.
+- Read `docs/SPRINT_SYNC.md` and `docs/SPRINT_SYSTEM.md` when performing sprint-related work.
+- Preserve repository-specific instructions and safety rules.
+
 ## Human Approval Boundaries
 
 All gated actions require explicit human approval in the current task. See [docs/HUMAN_APPROVAL_POLICY.md](docs/HUMAN_APPROVAL_POLICY.md) for the authoritative list.

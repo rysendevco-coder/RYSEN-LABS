@@ -137,6 +137,9 @@
     updateText("revenue-goal-name", sprint.revenue_goal.name);
     updateText("revenue-goal-description", sprint.revenue_goal.description);
     updateText("sprint-progress-label", `${sprint.progress.progress_percentage}%`);
+    updateText("sprint-actual-progress", `${sprint.progress.progress_percentage}%`);
+    updateText("sprint-expected-progress", `${sprint.schedule.expected_progress_percentage}%`);
+    updateText("sprint-schedule-status", sprint.schedule.schedule_status);
     const sprintBar = document.getElementById("sprint-progress-bar");
     if (sprintBar) sprintBar.style.width = `${sprint.progress.progress_percentage}%`;
 

@@ -20,6 +20,7 @@ services:
     volumes:
       - ./config/apps.yml:/app/config/apps.yml:ro
       - ./config/repositories.yml:/app/config/repositories.yml:ro
+      - ./roadmap:/app/roadmap:ro
     read_only: true
     tmpfs:
       - /tmp

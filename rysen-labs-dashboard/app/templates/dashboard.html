@@ -83,6 +83,11 @@
           <div class="progress-track" aria-hidden="true">
             <span id="sprint-progress-bar" style="width: {{ payload.sprint.progress.progress_percentage }}%"></span>
           </div>
+          <dl class="schedule-details">
+            <div><dt>Actual</dt><dd id="sprint-actual-progress">{{ payload.sprint.progress.progress_percentage }}%</dd></div>
+            <div><dt>Expected</dt><dd id="sprint-expected-progress">{{ payload.sprint.schedule.expected_progress_percentage }}%</dd></div>
+            <div><dt>Status</dt><dd><span class="status" id="sprint-schedule-status">{{ payload.sprint.schedule.schedule_status }}</span></dd></div>
+          </dl>
         </div>
 
         <section class="sprint-grid" id="sprint-projects" aria-label="Sprint projects">

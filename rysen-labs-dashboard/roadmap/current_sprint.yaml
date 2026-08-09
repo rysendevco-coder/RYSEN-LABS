@@ -23,6 +23,31 @@ tasks:
     points: 6
     status: in_progress
     notes: Keep scope focused on the existing Rip or Vault experience rather than adding unrelated features.
+    checkpoints:
+      - id: rov-002-a
+        name: Barcode/manual product identification path
+        points: 1
+        status: done
+      - id: rov-002-b
+        name: Product selection and metadata population flow
+        points: 1
+        status: in_progress
+      - id: rov-002-c
+        name: Pricing/market-value population and reset behavior
+        points: 1
+        status: done
+      - id: rov-002-d
+        name: Quantity/input/evaluation flow
+        points: 1
+        status: done
+      - id: rov-002-e
+        name: Result presentation and error/empty-state behavior
+        points: 1
+        status: todo
+      - id: rov-002-f
+        name: Full mobile regression of the primary evaluation path
+        points: 1
+        status: todo
 
   - id: rov-003
     project: rip-or-vault
@@ -31,6 +56,27 @@ tasks:
     points: 5
     status: todo
     notes: Do not attempt to build a perfect universal Pokemon product database during this sprint.
+    checkpoints:
+      - id: rov-003-a
+        name: Highest-priority barcode aliases/product matching
+        points: 1
+        status: done
+      - id: rov-003-b
+        name: High-impact catalog metadata completeness
+        points: 1
+        status: todo
+      - id: rov-003-c
+        name: Pricing-source coverage for MVP products
+        points: 1
+        status: in_progress
+      - id: rov-003-d
+        name: Product image/placeholder consistency
+        points: 1
+        status: done
+      - id: rov-003-e
+        name: Catalog/detail consistency regression
+        points: 1
+        status: todo
 
   - id: rov-004
     project: rip-or-vault

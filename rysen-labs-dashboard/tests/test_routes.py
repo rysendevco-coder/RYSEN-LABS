@@ -56,9 +56,11 @@ def test_sprint_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["progress"]["total_points"] == 36
-    assert payload["progress"]["completed_points"] == 9
-    assert payload["progress"]["progress_percentage"] == 25.0
+    assert payload["progress"]["completed_points"] == 14
+    assert payload["progress"]["progress_percentage"] == 38.9
     assert payload["progress"]["task_counts"]["blocked"] == 0
+    assert payload["schedule"]["expected_progress_percentage"] == 0.0
+    assert payload["schedule"]["schedule_status"] == "Ahead of Schedule"
 
 
 def test_projects_endpoint() -> None:

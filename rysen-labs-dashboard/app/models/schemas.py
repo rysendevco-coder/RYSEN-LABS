@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import StrEnum
 from pathlib import Path
 
-from pydantic import BaseModel, Field, HttpUrl, field_validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator, model_validator
 
 
 class AppHealthState(StrEnum):
@@ -44,6 +44,14 @@ class ProjectSprintStatus(StrEnum):
     ON_TRACK = "On Track"
     IN_PROGRESS = "In Progress"
     BLOCKED = "Blocked"
+    COMPLETE = "Complete"
+
+
+class ScheduleStatus(StrEnum):
+    AHEAD = "Ahead of Schedule"
+    ON_TRACK = "On Track"
+    AT_RISK = "At Risk"
+    BEHIND = "Behind"
     COMPLETE = "Complete"
 
 
@@ -168,6 +176,7 @@ class SprintTask(BaseModel):
     status: SprintTaskStatus
     blocker: str | None = None
     notes: str | None = None
+    checkpoints: list["SprintCheckpoint"] = Field(default_factory=list)
 
     @field_validator("id", "project")
     @classmethod
@@ -177,6 +186,31 @@ class SprintTask(BaseModel):
             raise ValueError("value cannot be empty")
         if any(char for char in cleaned if not (char.isalnum() or char in {"-", "_"})):
             raise ValueError("value must contain only letters, numbers, hyphens, or underscores")
+        return cleaned
+
+    @model_validator(mode="after")
+    def checkpoint_points_must_sum_to_task_points(self) -> "SprintTask":
+        if self.checkpoints and sum(checkpoint.points for checkpoint in self.checkpoints) != self.points:
+            raise ValueError("checkpoint points must sum to parent task points")
+        return self
+
+
+class SprintCheckpoint(BaseModel):
+    id: str
+    name: str
+    points: int = Field(ge=0)
+    status: SprintTaskStatus
+    blocker: str | None = None
+    notes: str | None = None
+
+    @field_validator("id")
+    @classmethod
+    def id_is_slug(cls, value: str) -> str:
+        cleaned = value.strip().lower()
+        if not cleaned:
+            raise ValueError("id cannot be empty")
+        if any(char for char in cleaned if not (char.isalnum() or char in {"-", "_"})):
+            raise ValueError("id must contain only letters, numbers, hyphens, or underscores")
         return cleaned
 
 
@@ -192,6 +226,12 @@ class SprintProgress(BaseModel):
     completed_points: int
     progress_percentage: float
     task_counts: TaskCounts
+
+
+class SprintSchedule(BaseModel):
+    expected_progress_percentage: float
+    schedule_variance: float
+    schedule_status: ScheduleStatus
 
 
 class ProjectSprintSummary(BaseModel):
@@ -222,6 +262,7 @@ class SprintSummary(BaseModel):
     projects: list[ProjectSprintSummary]
     needs_attention: list[SprintTask]
     progress: SprintProgress
+    schedule: SprintSchedule
     config_errors: list[str] = Field(default_factory=list)
 
 
