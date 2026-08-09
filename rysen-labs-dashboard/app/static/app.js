@@ -159,6 +159,7 @@
       const track = document.createElement("div");
       track.className = "progress-track";
       const bar = document.createElement("span");
+      bar.className = "progress-fill";
       bar.style.width = `${project.progress.progress_percentage}%`;
       track.append(bar);
 

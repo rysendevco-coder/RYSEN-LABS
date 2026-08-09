@@ -81,7 +81,7 @@
             <strong id="sprint-progress-label">{{ payload.sprint.progress.progress_percentage }}%</strong>
           </div>
           <div class="progress-track" aria-hidden="true">
-            <span id="sprint-progress-bar" style="width: {{ payload.sprint.progress.progress_percentage }}%"></span>
+            <span class="progress-fill" id="sprint-progress-bar" style="width: {{ payload.sprint.progress.progress_percentage }}%"></span>
           </div>
           <dl class="schedule-details">
             <div><dt>Actual</dt><dd id="sprint-actual-progress">{{ payload.sprint.progress.progress_percentage }}%</dd></div>
@@ -100,7 +100,7 @@
             <h3>{{ project.name }}</h3>
             <p>{{ project.current_focus }}</p>
             <div class="progress-track" aria-hidden="true">
-              <span style="width: {{ project.progress.progress_percentage }}%"></span>
+              <span class="progress-fill" style="width: {{ project.progress.progress_percentage }}%"></span>
             </div>
             <dl class="health-details">
               <div><dt>Progress</dt><dd>{{ project.progress.progress_percentage }}%</dd></div>

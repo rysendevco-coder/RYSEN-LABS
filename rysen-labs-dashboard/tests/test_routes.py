@@ -48,6 +48,18 @@ def test_safe_startup_without_docker_socket() -> None:
     assert "Rysen Labs Command Center" in response.text
 
 
+def test_dashboard_renders_sprint_progress_bars() -> None:
+    client = TestClient(app)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert 'id="sprint-progress-bar"' in response.text
+    assert 'class="progress-fill"' in response.text
+    assert "width: 38.9%" in response.text
+    assert "width: 47.6%" in response.text
+
+
 def test_sprint_endpoint() -> None:
     client = TestClient(app)
 
