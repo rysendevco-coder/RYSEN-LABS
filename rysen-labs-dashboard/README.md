@@ -16,6 +16,8 @@ Version 0.3 is a local-only, development-host readiness foundation. Do not deplo
 - `app/services/repository_registry.py` loads and validates `config/repositories.yml`.
 - `app/services/git_service.py` performs read-only Git repository inspection when enabled.
 - `app/services/sprint_service.py` loads roadmap YAML and calculates point-weighted sprint progress.
+- `app/services/sprint_sync_service.py` validates and archives file-based sprint update inbox entries.
+- `app/services/sprint_snapshot_service.py` writes daily sprint progress snapshots on command.
 - `app/services/health_checks.py` runs safe concurrent per-app HTTP checks.
 - `app/services/status_service.py` assembles the dashboard payload.
 - `app/realtime/sse.py` formats Server-Sent Events.
@@ -110,6 +112,10 @@ Sprint data lives in:
 roadmap/
   projects.yaml
   current_sprint.yaml
+  updates/
+    pending/
+    processed/
+    rejected/
   history/
 ```
 
@@ -139,6 +145,21 @@ If a task has checkpoints, checkpoint points must sum to the parent task points 
 
 Use `scripts/update_sprint.py` for explicit, safe task/checkpoint status updates. See `docs/SPRINT_SYNC.md` for the standard sprint update contract.
 
+Project repositories can emit verified `sprint_update` files into `roadmap/updates/pending/`. Process them with:
+
+```powershell
+python scripts/process_sprint_updates.py --dry-run --all
+python scripts/process_sprint_updates.py --apply --file roadmap/updates/pending/rov-update-001.yaml
+```
+
+Dry-run never mutates sprint state or moves files. Apply mode is authorized input and may change only the requested task/checkpoint `status`; processed and rejected files are archived for auditability.
+
+Create or refresh a daily sprint snapshot with:
+
+```powershell
+python scripts/snapshot_sprint.py
+```
+
 To start a new sprint, copy the previous `roadmap/current_sprint.yaml` into `roadmap/history/`, then edit `current_sprint.yaml` with the new sprint name, date range, objective, and task list. See `docs/SPRINT_SYSTEM.md`.
 
 ## Environment Variables
@@ -159,6 +180,8 @@ To start a new sprint, copy the previous `roadmap/current_sprint.yaml` into `roa
 - `SAFE_MODE`: default `true`; future management routes must honor this.
 - `LOG_LEVEL`: default `INFO`.
 - `APPS_CONFIG_PATH`: default `config/apps.yml`.
+- `SPRINT_UPDATES_DIR`: default `roadmap/updates`.
+- `SPRINT_HISTORY_DIR`: default `roadmap/history`.
 
 ## Endpoints
 
@@ -166,6 +189,7 @@ To start a new sprint, copy the previous `roadmap/current_sprint.yaml` into `roa
 - `GET /api/status` - read-only JSON payload.
 - `GET /api/repositories` - read-only repository status list.
 - `GET /api/sprint` - current sprint summary, project progress, blockers, and needs-attention tasks.
+- `GET /api/sprint/brief` - structured factual sprint brief data.
 - `GET /api/projects` - project-level sprint summaries.
 - `GET /api/events` - Server-Sent Events stream.
 - `GET /health` - container and service health endpoint.

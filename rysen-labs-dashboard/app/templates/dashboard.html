@@ -126,6 +126,24 @@
             {% endif %}
           </div>
         </section>
+
+        <section class="updates-panel">
+          <h3>Recent Updates</h3>
+          <div id="recent-updates">
+            {% if payload.sprint.recent_updates %}
+              {% for update in payload.sprint.recent_updates %}
+              <article class="update-item">
+                <span class="category">{{ update.project }}</span>
+                <strong>{{ update.checkpoint or update.task }}</strong>
+                <p>{{ update.recommended_status or "recommended" }} - {{ update.result }}</p>
+                <small>Processed: {{ update.processed_at or "unknown" }}</small>
+              </article>
+              {% endfor %}
+            {% else %}
+              <p class="quiet-state">No recent sprint updates</p>
+            {% endif %}
+          </div>
+        </section>
       </section>
       {% endif %}
 

@@ -12,4 +12,7 @@ This project is the Rysen Labs Dashboard, a local FastAPI command-center dashboa
 - Use repository-relative paths in examples and configuration.
 - Run tests before reporting completion.
 - Update `README.md`, `docs/PROJECT_STATUS.md`, and the root `CHANGELOG.md` when behavior changes.
+- Project repositories may emit verified `sprint_update` files, but this dashboard repository owns `roadmap/current_sprint.yaml`.
+- Sprint update automation must not invent percentages, add sprint scope, or alter point totals.
+- Sprint mutation still requires explicit authorization and must go through the sprint engine or safe CLI utilities.
 - Report commands and validation results honestly, including skipped or failed checks.

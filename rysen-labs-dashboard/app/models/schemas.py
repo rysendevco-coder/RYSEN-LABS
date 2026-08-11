@@ -234,6 +234,67 @@ class SprintSchedule(BaseModel):
     schedule_status: ScheduleStatus
 
 
+class SprintUpdateEvidence(BaseModel):
+    tests: str | None = None
+    validation: str | None = None
+    coverage: str | None = None
+    commit: str | None = None
+    build: str | None = None
+    other: str | None = None
+
+
+class SprintUpdateRecommendation(BaseModel):
+    status: SprintTaskStatus | None = None
+
+
+class SprintUpdatePayload(BaseModel):
+    project: str
+    task: str
+    checkpoint: str | None = None
+    result: str
+    evidence: SprintUpdateEvidence | dict[str, str] | str | None = None
+    recommendation: SprintUpdateRecommendation | dict[str, str] | str | None = None
+
+    @field_validator("project", "task", "checkpoint")
+    @classmethod
+    def slug_reference_fields(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        cleaned = value.strip().lower()
+        if not cleaned:
+            raise ValueError("value cannot be empty")
+        if any(char for char in cleaned if not (char.isalnum() or char in {"-", "_"})):
+            raise ValueError("value must contain only letters, numbers, hyphens, or underscores")
+        return cleaned
+
+
+class SprintUpdateFile(BaseModel):
+    update_id: str | None = None
+    sprint_update: SprintUpdatePayload
+
+
+class SprintUpdateRecord(BaseModel):
+    update_id: str
+    project: str
+    task: str
+    checkpoint: str | None = None
+    result: str
+    recommended_status: SprintTaskStatus | None = None
+    applied: bool = False
+    already_processed: bool = False
+    validation_error: str | None = None
+    source_file: str | None = None
+    archived_file: str | None = None
+    processed_at: datetime | None = None
+
+
+class ProjectSprintSyncSummary(BaseModel):
+    project: str
+    last_update_time: datetime | None = None
+    last_processed_checkpoint: str | None = None
+    update_count: int = 0
+
+
 class ProjectSprintSummary(BaseModel):
     id: str
     name: str
@@ -263,7 +324,34 @@ class SprintSummary(BaseModel):
     needs_attention: list[SprintTask]
     progress: SprintProgress
     schedule: SprintSchedule
+    recent_updates: list[SprintUpdateRecord] = Field(default_factory=list)
+    sync_projects: list[ProjectSprintSyncSummary] = Field(default_factory=list)
     config_errors: list[str] = Field(default_factory=list)
+
+
+class SprintBriefProject(BaseModel):
+    id: str
+    name: str
+    completed_points: int
+    total_points: int
+    progress_percentage: float
+    status: ProjectSprintStatus
+    last_update_time: datetime | None = None
+    last_processed_checkpoint: str | None = None
+    update_count: int = 0
+
+
+class SprintBrief(BaseModel):
+    sprint_name: str
+    days_remaining: int | None
+    actual_progress: float
+    expected_progress: float
+    variance: float
+    schedule_status: ScheduleStatus
+    per_project_progress: list[SprintBriefProject]
+    recent_processed_updates: list[SprintUpdateRecord]
+    blockers: list[SprintTask]
+    next_incomplete_checkpoints: list[dict[str, str]]
 
 
 class RepositoryStatus(BaseModel):

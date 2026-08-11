@@ -22,6 +22,80 @@ sprint_update:
 - Agents may recommend a status change.
 - Sprint state is only modified when explicitly authorized.
 - Commits, pushes, and deploys require explicit authorization.
+- Project repositories emit `sprint_update` evidence files; this dashboard repository owns `roadmap/current_sprint.yaml`.
+- No update may add sprint scope, alter point totals, or change sprint metadata automatically.
+
+## Sprint Update Inbox
+
+Project repositories can produce YAML or JSON files using the standard shape:
+
+```yaml
+update_id: rov-002-e-regression-20260811
+sprint_update:
+  project: rip-or-vault
+  task: rov-002
+  checkpoint: rov-002-e
+  result: passed
+  evidence:
+    tests: "34 passed"
+    validation: "result/error-state regression complete"
+    commit: "abc1234"
+  recommendation:
+    status: done
+```
+
+Place pending updates in:
+
+```text
+roadmap/updates/pending/
+```
+
+The processor validates project, task, checkpoint, and status references against the current roadmap. Valid applied updates are archived to `roadmap/updates/processed/`. Invalid updates are archived to `roadmap/updates/rejected/`. The original update file is preserved in the archive for auditability.
+
+Dry-run validates and reports without modifying sprint state or moving files:
+
+```powershell
+python scripts/process_sprint_updates.py --dry-run --all
+```
+
+Apply mode is authorized input. It may change only the requested task/checkpoint `status`:
+
+```powershell
+python scripts/process_sprint_updates.py --apply --file roadmap/updates/pending/rov-update-001.yaml
+```
+
+Duplicate updates are detected by `update_id` when present, or by a stable hash of the `sprint_update` payload. Already processed updates are reported and not applied again.
+
+## Daily Snapshots
+
+Write or refresh the current day's sprint progress snapshot with:
+
+```powershell
+python scripts/snapshot_sprint.py
+```
+
+Snapshots are stored in `roadmap/history/YYYY-MM-DD.yaml` and include sprint totals, schedule health, and per-project progress. Running the command repeatedly on the same day safely refreshes that day's snapshot.
+
+## Morning Brief Data
+
+`GET /api/sprint/brief` returns structured factual data for a future morning founder brief:
+
+- sprint name
+- days remaining
+- actual, expected, variance, and schedule status
+- per-project progress
+- recent processed updates
+- blockers
+- next incomplete checkpoints
+
+The backend does not generate AI prose.
+
+## Adding A New Project
+
+1. Add the project to `roadmap/projects.yaml`.
+2. Add sprint tasks/checkpoints to `roadmap/current_sprint.yaml`.
+3. Have the project repo emit `sprint_update` files with the same standard shape.
+4. Process updates through this dashboard repo; do not write directly to `current_sprint.yaml` from project repos.
 
 ## Safe Update Utility
 

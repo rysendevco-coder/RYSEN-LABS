@@ -12,6 +12,8 @@ DEFAULT_APPS_CONFIG = BASE_DIR / "config" / "apps.yml"
 DEFAULT_REPOSITORIES_CONFIG = BASE_DIR / "config" / "repositories.yml"
 DEFAULT_PROJECTS_CONFIG = BASE_DIR / "roadmap" / "projects.yaml"
 DEFAULT_CURRENT_SPRINT_CONFIG = BASE_DIR / "roadmap" / "current_sprint.yaml"
+DEFAULT_SPRINT_UPDATES_DIR = BASE_DIR / "roadmap" / "updates"
+DEFAULT_SPRINT_HISTORY_DIR = BASE_DIR / "roadmap" / "history"
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -51,6 +53,8 @@ class Settings(BaseModel):
     repositories_config_path: Path = DEFAULT_REPOSITORIES_CONFIG
     projects_config_path: Path = DEFAULT_PROJECTS_CONFIG
     current_sprint_config_path: Path = DEFAULT_CURRENT_SPRINT_CONFIG
+    sprint_updates_dir: Path = DEFAULT_SPRINT_UPDATES_DIR
+    sprint_history_dir: Path = DEFAULT_SPRINT_HISTORY_DIR
     git_command_timeout_seconds: float = Field(default=5.0, gt=0, le=60)
     git_max_repositories: int | None = Field(default=None, gt=0, le=500)
     git_scan_cache_seconds: float = Field(default=15.0, ge=0, le=300)
@@ -86,6 +90,8 @@ def get_settings() -> Settings:
         current_sprint_config_path=Path(
             os.getenv("CURRENT_SPRINT_CONFIG_PATH", str(DEFAULT_CURRENT_SPRINT_CONFIG)),
         ),
+        sprint_updates_dir=Path(os.getenv("SPRINT_UPDATES_DIR", str(DEFAULT_SPRINT_UPDATES_DIR))),
+        sprint_history_dir=Path(os.getenv("SPRINT_HISTORY_DIR", str(DEFAULT_SPRINT_HISTORY_DIR))),
         git_command_timeout_seconds=float(os.getenv("GIT_COMMAND_TIMEOUT_SECONDS", "5")),
         git_max_repositories=_env_optional_int("GIT_MAX_REPOSITORIES"),
         git_scan_cache_seconds=float(os.getenv("GIT_SCAN_CACHE_SECONDS", "15")),

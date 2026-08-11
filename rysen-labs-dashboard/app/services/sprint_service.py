@@ -12,6 +12,8 @@ from app.config import Settings
 from app.models.schemas import (
     ProjectConfig,
     ProjectSprintStatus,
+    SprintBrief,
+    SprintBriefProject,
     ScheduleStatus,
     SprintCheckpoint,
     ProjectSprintSummary,
@@ -23,6 +25,7 @@ from app.models.schemas import (
     SprintTaskStatus,
     TaskCounts,
 )
+from app.services.sprint_sync_service import SprintUpdateInboxService
 
 
 logger = logging.getLogger(__name__)
@@ -200,6 +203,8 @@ class SprintService:
         progress = calculate_progress(tasks)
         start = _parse_sprint_date(payload.get("start_date"))
         end = _parse_sprint_date(payload.get("end_date"))
+        sync = SprintUpdateInboxService(self.settings)
+        project_ids = [project.id for project in projects]
         return SprintSummary(
             name=str(payload.get("name", "No active sprint")),
             start_date=str(payload.get("start_date", "")),
@@ -216,6 +221,8 @@ class SprintService:
             needs_attention=needs_attention,
             progress=progress,
             schedule=calculate_schedule(progress, start, end, as_of or date.today()),
+            recent_updates=sync.recent_processed_updates(),
+            sync_projects=sync.project_freshness(project_ids),
             config_errors=errors,
         )
 
@@ -231,4 +238,73 @@ class SprintService:
             tasks=tasks,
             progress=calculate_progress(tasks),
             display_order=project.display_order,
+        )
+
+    def load_brief(self, as_of: date | None = None) -> SprintBrief:
+        today = as_of or date.today()
+        sprint = self.load_sprint(as_of=today)
+        end = _parse_sprint_date(sprint.end_date)
+        days_remaining = max((end - today).days, 0) if end else None
+        sync_by_project = {summary.project: summary for summary in sprint.sync_projects}
+
+        blockers: list[SprintTask] = []
+        next_incomplete: list[dict[str, str]] = []
+        for project in sprint.projects:
+            blockers.extend(project.blockers)
+            for task in project.tasks:
+                if task.checkpoints:
+                    checkpoint = next((item for item in task.checkpoints if item.status != SprintTaskStatus.DONE), None)
+                    if checkpoint:
+                        next_incomplete.append(
+                            {
+                                "project": project.id,
+                                "task": task.id,
+                                "checkpoint": checkpoint.id,
+                                "name": checkpoint.name,
+                                "status": checkpoint.status.value,
+                            },
+                        )
+                        break
+                elif task.status != SprintTaskStatus.DONE:
+                    next_incomplete.append(
+                        {
+                            "project": project.id,
+                            "task": task.id,
+                            "checkpoint": "",
+                            "name": task.name,
+                            "status": task.status.value,
+                        },
+                    )
+                    break
+
+        return SprintBrief(
+            sprint_name=sprint.name,
+            days_remaining=days_remaining,
+            actual_progress=sprint.progress.progress_percentage,
+            expected_progress=sprint.schedule.expected_progress_percentage,
+            variance=sprint.schedule.schedule_variance,
+            schedule_status=sprint.schedule.schedule_status,
+            per_project_progress=[
+                SprintBriefProject(
+                    id=project.id,
+                    name=project.name,
+                    completed_points=project.progress.completed_points,
+                    total_points=project.progress.total_points,
+                    progress_percentage=project.progress.progress_percentage,
+                    status=project.status,
+                    last_update_time=sync_by_project.get(project.id).last_update_time
+                    if sync_by_project.get(project.id)
+                    else None,
+                    last_processed_checkpoint=sync_by_project.get(project.id).last_processed_checkpoint
+                    if sync_by_project.get(project.id)
+                    else None,
+                    update_count=sync_by_project.get(project.id).update_count
+                    if sync_by_project.get(project.id)
+                    else 0,
+                )
+                for project in sprint.projects
+            ],
+            recent_processed_updates=sprint.recent_updates,
+            blockers=blockers,
+            next_incomplete_checkpoints=next_incomplete[:6],
         )

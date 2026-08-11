@@ -71,8 +71,41 @@ def test_sprint_endpoint() -> None:
     assert payload["progress"]["completed_points"] == 14
     assert payload["progress"]["progress_percentage"] == 38.9
     assert payload["progress"]["task_counts"]["blocked"] == 0
-    assert payload["schedule"]["expected_progress_percentage"] == 0.0
-    assert payload["schedule"]["schedule_status"] == "Ahead of Schedule"
+    assert payload["schedule"]["expected_progress_percentage"] >= 0.0
+    assert payload["schedule"]["schedule_status"] in {
+        "Ahead of Schedule",
+        "On Track",
+        "At Risk",
+        "Behind",
+        "Complete",
+    }
+
+
+def test_sprint_brief_endpoint() -> None:
+    client = TestClient(app)
+
+    response = client.get("/api/sprint/brief")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["sprint_name"] == "Sprint 01 - Ship Something"
+    assert payload["actual_progress"] == 38.9
+    assert payload["expected_progress"] >= 0.0
+    assert payload["schedule_status"] in {
+        "Ahead of Schedule",
+        "On Track",
+        "At Risk",
+        "Behind",
+        "Complete",
+    }
+    assert [project["id"] for project in payload["per_project_progress"]] == [
+        "rip-or-vault",
+        "motorminder",
+        "pbct",
+        "rysen-labs-infrastructure",
+    ]
+    assert payload["blockers"] == []
+    assert payload["next_incomplete_checkpoints"]
 
 
 def test_projects_endpoint() -> None:

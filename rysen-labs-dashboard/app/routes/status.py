@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from app.config import get_settings
-from app.models.schemas import DashboardStatus, ProjectSprintSummary, RepositoryStatus, SprintSummary
+from app.models.schemas import DashboardStatus, ProjectSprintSummary, RepositoryStatus, SprintBrief, SprintSummary
 from app.services.sprint_service import SprintService
 from app.services.status_service import StatusService
 
@@ -25,6 +25,11 @@ async def api_repositories() -> list[RepositoryStatus]:
 @router.get("/api/sprint", response_model=SprintSummary)
 async def api_sprint() -> SprintSummary:
     return SprintService(get_settings()).load_sprint()
+
+
+@router.get("/api/sprint/brief", response_model=SprintBrief)
+async def api_sprint_brief() -> SprintBrief:
+    return SprintService(get_settings()).load_brief()
 
 
 @router.get("/api/projects", response_model=list[ProjectSprintSummary])

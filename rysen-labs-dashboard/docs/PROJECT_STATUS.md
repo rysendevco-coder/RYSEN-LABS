@@ -16,6 +16,9 @@ Current version: 0.3.0
 - Structured JSON logging.
 - Hardened Dockerfile and Compose defaults.
 - Mobile-first dark command-center UI.
+- Sprint update inbox for validated project evidence files.
+- Daily sprint snapshot command.
+- Structured morning brief endpoint.
 - Local test suite that does not require Docker or ZimaBoard access.
 
 ## Architecture Summary
@@ -51,7 +54,8 @@ The warning comes from FastAPI/Starlette test client dependency guidance.
 ## Known Limitations
 
 - No authentication yet.
-- No persistence or historical metrics.
+- No database persistence.
+- Historical sprint snapshots are command-generated only; no scheduler is installed.
 - Health checks are point-in-time checks only.
 - Docker inspection is optional and disabled by default.
 - Git inspection is optional and disabled by default.
@@ -82,6 +86,7 @@ The warning comes from FastAPI/Starlette test client dependency guidance.
 - Alerting integrations.
 - Databases.
 - AI integrations.
+- Automatic sprint update generation from GitHub or project repositories.
 - CasaOS write operations.
 
 ## Recommended Next Phase

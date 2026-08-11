@@ -135,12 +135,12 @@ tasks:
 
 
 def test_overall_sprint_progress_is_point_weighted() -> None:
-    sprint = SprintService(Settings()).load_sprint()
+    sprint = SprintService(Settings()).load_sprint(as_of=date(2026, 8, 11))
 
     assert sprint.progress.total_points == 36
     assert sprint.progress.completed_points == 14
     assert sprint.progress.progress_percentage == 38.9
-    assert sprint.schedule.expected_progress_percentage == 0.0
+    assert sprint.schedule.expected_progress_percentage == 7.7
     assert sprint.schedule.schedule_status == ScheduleStatus.AHEAD
 
 

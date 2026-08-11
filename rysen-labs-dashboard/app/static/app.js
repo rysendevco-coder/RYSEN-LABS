@@ -4,6 +4,7 @@
   const repositories = document.querySelector("#repositories");
   const sprintProjects = document.querySelector("#sprint-projects");
   const needsAttention = document.querySelector("#needs-attention");
+  const recentUpdates = document.querySelector("#recent-updates");
   const emptyState = document.querySelector("#empty-state");
   const repositoriesEmptyState = document.querySelector("#repositories-empty-state");
   const configErrors = document.querySelector("#config-errors");
@@ -188,18 +189,36 @@
     needsAttention.replaceChildren();
     if (sprint.needs_attention.length === 0) {
       needsAttention.append(createTextElement("p", "quiet-state", "No active blockers"));
+    } else {
+      for (const task of sprint.needs_attention) {
+        const item = document.createElement("article");
+        item.className = "attention-item";
+        item.dataset.status = task.status;
+        item.append(
+          createTextElement("span", "status", task.status.replaceAll("_", " ")),
+          createTextElement("strong", "", task.name),
+          createTextElement("p", "", task.blocker || task.description),
+        );
+        needsAttention.append(item);
+      }
+    }
+
+    if (!recentUpdates) return;
+    recentUpdates.replaceChildren();
+    if ((sprint.recent_updates || []).length === 0) {
+      recentUpdates.append(createTextElement("p", "quiet-state", "No recent sprint updates"));
       return;
     }
-    for (const task of sprint.needs_attention) {
+    for (const update of sprint.recent_updates) {
       const item = document.createElement("article");
-      item.className = "attention-item";
-      item.dataset.status = task.status;
+      item.className = "update-item";
       item.append(
-        createTextElement("span", "status", task.status.replaceAll("_", " ")),
-        createTextElement("strong", "", task.name),
-        createTextElement("p", "", task.blocker || task.description),
+        createTextElement("span", "category", update.project),
+        createTextElement("strong", "", update.checkpoint || update.task),
+        createTextElement("p", "", `${update.recommended_status || "recommended"} - ${update.result}`),
+        createTextElement("small", "", `Processed: ${update.processed_at ? formatTime(update.processed_at) : "unknown"}`),
       );
-      needsAttention.append(item);
+      recentUpdates.append(item);
     }
   }
 
