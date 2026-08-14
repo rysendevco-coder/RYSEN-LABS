@@ -17,6 +17,7 @@ Current version: 0.3.0
 - Hardened Dockerfile and Compose defaults.
 - Mobile-first dark command-center UI.
 - Sprint update inbox for validated project evidence files.
+- PowerShell checkpoint workflow for Git metadata capture and inbox update generation.
 - Daily sprint snapshot command.
 - Structured morning brief endpoint.
 - Local test suite that does not require Docker or ZimaBoard access.

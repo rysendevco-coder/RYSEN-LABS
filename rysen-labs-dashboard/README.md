@@ -154,6 +154,14 @@ python scripts/process_sprint_updates.py --apply --file roadmap/updates/pending/
 
 Dry-run never mutates sprint state or moves files. Apply mode is authorized input and may change only the requested task/checkpoint `status`; processed and rejected files are archived for auditability.
 
+Use the PowerShell checkpoint workflow to validate a project checkpoint, capture Git metadata, and emit an inbox update:
+
+```powershell
+.\scripts\checkpoint.ps1 -Project rip-or-vault -Task rov-002 -Checkpoint rov-002-e -Status done -RepositoryPath ..\rip-or-vault
+```
+
+See `docs/CHECKPOINT_WORKFLOW.md`.
+
 Create or refresh a daily sprint snapshot with:
 
 ```powershell

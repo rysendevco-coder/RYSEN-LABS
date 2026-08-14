@@ -12,6 +12,7 @@ This changelog follows a Keep a Changelog-inspired structure.
 - Added the first Rysen Labs Project/Sprint Command Center with YAML roadmap files, point-weighted sprint progress, `/api/sprint`, `/api/projects`, dashboard sprint cards, needs-attention tracking, and sprint system documentation.
 - Added Sprint Sync V1.1 support for optional task checkpoints, backend schedule health, schedule status UI, read-only roadmap Compose mounting, a safe sprint update CLI, sprint sync documentation, and expanded tests.
 - Added automated sprint update pipeline support with a validated update inbox, processed/rejected archives, daily sprint snapshots, a structured morning brief endpoint, compact dashboard update activity, and expanded tests.
+- Added a PowerShell checkpoint workflow that captures validation and Git metadata, emits sprint update inbox files, supports idempotent apply/dry-run processing, and documents Codex checkpoint usage.
 
 ## [0.1.0] - 2026-07-10 - Foundation
 

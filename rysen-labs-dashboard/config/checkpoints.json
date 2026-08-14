@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "rip-or-vault": {
+      "description": "Rip or Vault / Collector Command Center",
+      "validation_command": ""
+    },
+    "motorminder": {
+      "description": "MotorMinder",
+      "validation_command": ""
+    },
+    "pbct": {
+      "description": "Powered by Christ & Turbos",
+      "validation_command": ""
+    },
+    "rysen-labs-infrastructure": {
+      "description": "Rysen Labs Infrastructure",
+      "validation_command": ".\\.venv\\Scripts\\python.exe -m pytest"
+    }
+  }
+}

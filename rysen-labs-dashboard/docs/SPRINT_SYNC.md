@@ -66,6 +66,8 @@ python scripts/process_sprint_updates.py --apply --file roadmap/updates/pending/
 
 Duplicate updates are detected by `update_id` when present, or by a stable hash of the `sprint_update` payload. Already processed updates are reported and not applied again.
 
+For a Git-aware developer checkpoint workflow, use `scripts/checkpoint.ps1`. It records branch, commit SHA, commit message, validation status, and optional notes before handing the generated update to the same inbox processor. See `docs/CHECKPOINT_WORKFLOW.md`.
+
 ## Daily Snapshots
 
 Write or refresh the current day's sprint progress snapshot with:
