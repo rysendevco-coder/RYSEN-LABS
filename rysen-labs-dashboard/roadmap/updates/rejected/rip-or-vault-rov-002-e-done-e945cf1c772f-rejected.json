@@ -1,0 +1,28 @@
+{
+  "update_id": "rip-or-vault-rov-002-e-done-e945cf1c772f",
+  "rejected_date": "2026-08-22",
+  "rejection_reason": "Required checkpoint validation evidence was missing. The update evidence reported: No validation command configured.",
+  "disposition": "rejected_without_applying",
+  "sprint_state_changed": false,
+  "original_update": {
+    "update_id": "rip-or-vault-rov-002-e-done-e945cf1c772f",
+    "sprint_update": {
+      "checkpoint": "rov-002-e",
+      "task": "rov-002",
+      "result": "passed",
+      "evidence": {
+        "commit": "e945cf1c772f0398cdc27ad84f306a48cec5762c",
+        "repository": "PokemonSniper",
+        "timestamp": "2026-08-15T00:51:32.8399197Z",
+        "commit_message": "Prepare internal build 0.1.1",
+        "branch": "main",
+        "working_tree": "clean",
+        "validation": "No validation command configured."
+      },
+      "recommendation": {
+        "status": "done"
+      },
+      "project": "rip-or-vault"
+    }
+  }
+}
