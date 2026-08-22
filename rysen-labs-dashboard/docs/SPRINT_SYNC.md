@@ -140,6 +140,24 @@ deploy/systemd/rysen-labs-dashboard-sync.timer
 
 They are prepared for later manual installation on the ZimaBoard. The script fetches `origin`, fast-forwards only a clean approved branch, refuses dirty or non-fast-forward states, logs clearly, and never restarts Docker or rebuilds containers. Roadmap updates become visible through the existing read-only `./roadmap:/app/roadmap:ro` volume mount.
 
+The prepared service matches the confirmed ZimaBoard checkout:
+
+```text
+/home/charles/projects/RYSEN-LABS
+```
+
+Future authorized install commands:
+
+```bash
+cd /home/charles/projects/RYSEN-LABS
+chmod +x rysen-labs-dashboard/scripts/zima_sync.sh
+sudo cp rysen-labs-dashboard/deploy/systemd/rysen-labs-dashboard-sync.service /etc/systemd/system/
+sudo cp rysen-labs-dashboard/deploy/systemd/rysen-labs-dashboard-sync.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now rysen-labs-dashboard-sync.timer
+systemctl status rysen-labs-dashboard-sync.timer
+```
+
 ## Safe Update Utility
 
 Use `scripts/update_sprint.py` only when sprint-state modification is explicitly authorized.

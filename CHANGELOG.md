@@ -15,6 +15,7 @@ This changelog follows a Keep a Changelog-inspired structure.
 - Added a PowerShell checkpoint workflow that captures validation and Git metadata, emits sprint update inbox files, supports idempotent apply/dry-run processing, and documents Codex checkpoint usage.
 - Registered Lunch Roulette as a managed dashboard project for Sprint Update / Auto-Sync evidence intake without altering Sprint 01 scope or progress.
 - Added Sprint Auto-Sync V1.2 transaction safeguards, evidence-only activity records, ZimaBoard safe sync artifacts, and dashboard latest-activity visibility.
+- Corrected ZimaBoard sync service paths to the confirmed `/home/charles/projects/RYSEN-LABS` checkout.
 
 ## [0.1.0] - 2026-07-10 - Foundation
 

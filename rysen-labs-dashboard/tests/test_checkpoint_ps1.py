@@ -233,12 +233,23 @@ def test_checkpoint_ps1_reopened_task_recalculates_progress(tmp_path: Path) -> N
 def test_zima_sync_script_uses_safe_fast_forward_only() -> None:
     script = (ROOT / "scripts" / "zima_sync.sh").read_text(encoding="utf-8")
 
+    assert "/home/charles/projects/RYSEN-LABS" in script
+    assert "/opt/rysen-labs-dashboard" not in script
     assert "status --porcelain" in script
     assert "merge --ff-only" in script
     assert "refusing sync: working tree is dirty" in script
     assert "cannot fast-forward" in script
     assert "reset --hard" not in script
     assert "docker" not in script.lower()
+
+
+def test_zima_sync_systemd_service_uses_confirmed_host_paths() -> None:
+    service = (ROOT / "deploy" / "systemd" / "rysen-labs-dashboard-sync.service").read_text(encoding="utf-8")
+
+    assert "WorkingDirectory=/home/charles/projects/RYSEN-LABS" in service
+    assert "Environment=RYSEN_DASHBOARD_DIR=/home/charles/projects/RYSEN-LABS" in service
+    assert "ExecStart=/home/charles/projects/RYSEN-LABS/rysen-labs-dashboard/scripts/zima_sync.sh" in service
+    assert "/opt/rysen-labs-dashboard" not in service
 
 
 def test_checkpoint_ps1_commit_state_mode_has_dashboard_guards() -> None:

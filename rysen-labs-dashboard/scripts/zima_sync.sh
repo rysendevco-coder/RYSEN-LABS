@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="${RYSEN_DASHBOARD_DIR:-/opt/rysen-labs-dashboard}"
+APP_DIR="${RYSEN_DASHBOARD_DIR:-/home/charles/projects/RYSEN-LABS}"
 REMOTE="${RYSEN_DASHBOARD_REMOTE:-origin}"
 BRANCH="${RYSEN_DASHBOARD_BRANCH:-develop}"
 

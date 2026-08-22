@@ -203,6 +203,24 @@ deploy/systemd/rysen-labs-dashboard-sync.timer
 
 The sync script fetches `origin`, fast-forwards only a clean approved branch, refuses dirty or non-fast-forward states, and never restarts or rebuilds Docker. Install and enable the service/timer only after explicit deployment authorization.
 
+The prepared systemd unit assumes the RYSEN-LABS repository is checked out at:
+
+```text
+/home/charles/projects/RYSEN-LABS
+```
+
+Recommended ZimaBoard installation commands, for a future authorized deployment:
+
+```bash
+cd /home/charles/projects/RYSEN-LABS
+chmod +x rysen-labs-dashboard/scripts/zima_sync.sh
+sudo cp rysen-labs-dashboard/deploy/systemd/rysen-labs-dashboard-sync.service /etc/systemd/system/
+sudo cp rysen-labs-dashboard/deploy/systemd/rysen-labs-dashboard-sync.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now rysen-labs-dashboard-sync.timer
+systemctl status rysen-labs-dashboard-sync.timer
+```
+
 ## Environment Variables
 
 - `HOST_LABEL`: display label, default `rysen-labs`.

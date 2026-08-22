@@ -5,8 +5,8 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-WorkingDirectory=/opt/rysen-labs-dashboard
-Environment=RYSEN_DASHBOARD_DIR=/opt/rysen-labs-dashboard
+WorkingDirectory=/home/charles/projects/RYSEN-LABS
+Environment=RYSEN_DASHBOARD_DIR=/home/charles/projects/RYSEN-LABS
 Environment=RYSEN_DASHBOARD_REMOTE=origin
 Environment=RYSEN_DASHBOARD_BRANCH=develop
-ExecStart=/opt/rysen-labs-dashboard/scripts/zima_sync.sh
+ExecStart=/home/charles/projects/RYSEN-LABS/rysen-labs-dashboard/scripts/zima_sync.sh
