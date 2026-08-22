@@ -90,7 +90,7 @@ def _write_update(path: Path, **overrides: object) -> Path:
         },
     }
     for key, value in overrides.items():
-        if key in payload["sprint_update"]:
+        if key in payload["sprint_update"] or key == "activity_only":
             payload["sprint_update"][key] = value
         else:
             payload[key] = value
@@ -139,6 +139,30 @@ def test_unknown_project_task_checkpoint_and_invalid_status(tmp_path: Path) -> N
         assert record.validation_error
 
 
+def test_completion_update_requires_objective_evidence(tmp_path: Path) -> None:
+    settings = _write_fixture(tmp_path)
+    path = _write_update(
+        settings.sprint_updates_dir / "pending" / "weak-evidence.yaml",
+        evidence=None,
+    )
+
+    record = SprintUpdateInboxService(settings).process_file(path, apply=False)
+
+    assert record.validation_error == "completion updates require objective validation evidence"
+
+
+def test_no_validation_command_does_not_qualify_as_done_evidence(tmp_path: Path) -> None:
+    settings = _write_fixture(tmp_path)
+    path = _write_update(
+        settings.sprint_updates_dir / "pending" / "no-validation.yaml",
+        evidence={"validation": "No validation command configured.", "commit": "abc1234"},
+    )
+
+    record = SprintUpdateInboxService(settings).process_file(path, apply=False)
+
+    assert record.validation_error == "completion updates require a real validation command or test evidence"
+
+
 def test_registered_project_without_active_sprint_task_is_rejected_by_task(tmp_path: Path) -> None:
     settings = _write_fixture(tmp_path)
     path = _write_update(
@@ -152,6 +176,30 @@ def test_registered_project_without_active_sprint_task_is_rejected_by_task(tmp_p
     record = SprintUpdateInboxService(settings).process_file(path, apply=False)
 
     assert record.validation_error == "Unknown task 'lr-009'"
+
+
+def test_activity_only_update_for_out_of_sprint_project_does_not_change_sprint_math(tmp_path: Path) -> None:
+    settings = _write_fixture(tmp_path)
+    path = _write_update(
+        settings.sprint_updates_dir / "pending" / "lunch-roulette-activity.yaml",
+        update_id="lunch-roulette-checkpoint-8",
+        project="lunch-roulette",
+        task="lr-008",
+        checkpoint="lr-008-a",
+        activity_only=True,
+        evidence={"tests": "71 passed", "commit": "4b882661e9f9d652c7b9852865a433011108e59a"},
+    )
+
+    record = SprintUpdateInboxService(settings).process_file(path, apply=True)
+    sprint = SprintService(settings).load_sprint()
+    projects = {project.id: project for project in sprint.projects}
+
+    assert not record.applied
+    assert record.activity_only
+    assert sprint.progress.completed_points == 0
+    assert projects["lunch-roulette"].update_count == 1
+    assert projects["lunch-roulette"].last_processed_checkpoint == "lr-008-a"
+    assert projects["lunch-roulette"].latest_source_commit_sha == "4b882661e9f9d652c7b9852865a433011108e59a"
 
 
 def test_dry_run_does_not_mutate_state_or_move_file(tmp_path: Path) -> None:

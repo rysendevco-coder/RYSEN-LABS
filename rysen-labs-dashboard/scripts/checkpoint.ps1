@@ -32,6 +32,14 @@ param(
 
     [switch]$Apply,
 
+    [switch]$CommitSprintState,
+
+    [switch]$PushSprintState,
+
+    [string]$SprintStateBranch = "develop",
+
+    [string]$ExpectedRemote = "origin",
+
     [string]$UpdateId
 )
 
@@ -53,6 +61,18 @@ function Invoke-Git {
         throw "git $($Arguments -join ' ') failed: $output"
     }
     return ($output | Out-String).Trim()
+}
+
+function Invoke-GitAllowFailure {
+    param(
+        [string]$RepoPath,
+        [string[]]$Arguments
+    )
+    $output = & git -C $RepoPath @Arguments 2>&1
+    return @{
+        ExitCode = $LASTEXITCODE
+        Output = ($output | Out-String).Trim()
+    }
 }
 
 function Get-SafeSlug {
@@ -111,6 +131,120 @@ function Invoke-ValidationCommand {
     return $Command
 }
 
+function Assert-GitDiffCheck {
+    param([string]$RepoPath)
+    $output = & git -C $RepoPath diff --check 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "git diff --check failed: $output"
+    }
+}
+
+function Assert-CommitExists {
+    param(
+        [string]$RepoPath,
+        [string]$Sha
+    )
+    $result = Invoke-GitAllowFailure -RepoPath $RepoPath -Arguments @("cat-file", "-e", "$Sha^{commit}")
+    if ($result.ExitCode -ne 0) {
+        throw "Project commit '$Sha' does not exist."
+    }
+}
+
+function Assert-BranchSynchronized {
+    param(
+        [string]$RepoPath,
+        [string]$RemoteName
+    )
+    $remote = Invoke-GitAllowFailure -RepoPath $RepoPath -Arguments @("remote", "get-url", $RemoteName)
+    if ($remote.ExitCode -ne 0 -or [string]::IsNullOrWhiteSpace($remote.Output)) {
+        throw "Expected remote '$RemoteName' is not configured."
+    }
+    $upstream = Invoke-GitAllowFailure -RepoPath $RepoPath -Arguments @("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+    if ($upstream.ExitCode -ne 0 -or [string]::IsNullOrWhiteSpace($upstream.Output)) {
+        throw "Project branch is not tracking an upstream branch."
+    }
+    $fetch = Invoke-GitAllowFailure -RepoPath $RepoPath -Arguments @("fetch", "--quiet", $RemoteName)
+    if ($fetch.ExitCode -ne 0) {
+        throw "Could not fetch expected remote '$RemoteName': $($fetch.Output)"
+    }
+    $counts = Invoke-Git -RepoPath $RepoPath -Arguments @("rev-list", "--left-right", "--count", "HEAD...@{u}")
+    $parts = $counts -split "\s+"
+    if ($parts.Count -lt 2 -or $parts[0] -ne "0" -or $parts[1] -ne "0") {
+        throw "Project branch is not synchronized with upstream; ahead=$($parts[0]) behind=$($parts[1])."
+    }
+}
+
+function Assert-DashboardCleanBeforeMutation {
+    param([string]$Root)
+    $status = Invoke-Git -RepoPath $Root -Arguments @("status", "--porcelain", "--", ".")
+    if (-not [string]::IsNullOrWhiteSpace($status)) {
+        throw "RYSEN-LABS dashboard working tree contains unexpected changes before sprint mutation: $status"
+    }
+}
+
+function Assert-DashboardBranch {
+    param(
+        [string]$Root,
+        [string]$ExpectedBranch
+    )
+    $branch = Invoke-Git -RepoPath $Root -Arguments @("branch", "--show-current")
+    if ($branch -ne $ExpectedBranch) {
+        throw "RYSEN-LABS dashboard branch '$branch' is not approved branch '$ExpectedBranch'."
+    }
+}
+
+function Assert-DashboardChangesExpected {
+    param([string]$Root)
+    $status = Invoke-Git -RepoPath $Root -Arguments @("status", "--porcelain", "--", ".")
+    if ([string]::IsNullOrWhiteSpace($status)) {
+        throw "No RYSEN-LABS sprint-state changes found to commit."
+    }
+    foreach ($line in ($status -split "`r?`n")) {
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            continue
+        }
+        $path = $line.Substring(3).Replace("\", "/")
+        $allowed = (
+            $path -eq "roadmap/current_sprint.yaml" -or
+            $path.StartsWith("roadmap/updates/processed/") -or
+            $path.StartsWith("roadmap/updates/rejected/")
+        )
+        if (-not $allowed) {
+            throw "Unexpected RYSEN-LABS change in checkpoint transaction: $line"
+        }
+    }
+
+    $diff = Invoke-Git -RepoPath $Root -Arguments @("diff", "--unified=0", "--", "roadmap/current_sprint.yaml")
+    foreach ($line in ($diff -split "`r?`n")) {
+        if ($line.StartsWith("+++") -or $line.StartsWith("---") -or -not ($line.StartsWith("+") -or $line.StartsWith("-"))) {
+            continue
+        }
+        if ($line -notmatch "^[+-]\s+status:\s+(todo|in_progress|blocked|done)\s*$") {
+            throw "Sprint-state change contains non-status edit: $line"
+        }
+    }
+}
+
+function Invoke-DashboardValidation {
+    param(
+        [string]$Root,
+        [string]$Python
+    )
+    & $Python -m pytest tests/test_sprint_sync_service.py tests/test_sprint_service.py tests/test_routes.py
+    if ($LASTEXITCODE -ne 0) {
+        throw "RYSEN-LABS sprint tests failed."
+    }
+    & $Python -m pytest
+    if ($LASTEXITCODE -ne 0) {
+        throw "RYSEN-LABS full test suite failed."
+    }
+    & $Python -m compileall app tests scripts
+    if ($LASTEXITCODE -ne 0) {
+        throw "RYSEN-LABS compileall failed."
+    }
+    Assert-GitDiffCheck -RepoPath $Root
+}
+
 function Write-SprintUpdateFile {
     param(
         [string]$Path,
@@ -148,6 +282,25 @@ try {
     $taskId = Get-SafeSlug $Task
     $checkpointId = if ([string]::IsNullOrWhiteSpace($Checkpoint)) { "" } else { Get-SafeSlug $Checkpoint }
     $normalizedStatus = if ($Status -eq "complete") { "done" } else { $Status }
+    $target = if ([string]::IsNullOrWhiteSpace($checkpointId)) { $taskId } else { $checkpointId }
+    $isAutomaticCompletion = $Apply -and $normalizedStatus -eq "done"
+
+    if ($isAutomaticCompletion -and $AllowDirty) {
+        throw "Automatic completion to done cannot use -AllowDirty."
+    }
+    if ($isAutomaticCompletion -and $SkipValidation) {
+        throw "Automatic completion to done requires a real validation command; -SkipValidation is not allowed."
+    }
+    if ($CommitSprintState -or $PushSprintState) {
+        if (-not $Apply) {
+            throw "-CommitSprintState and -PushSprintState require -Apply."
+        }
+        if ($PushSprintState -and -not $CommitSprintState) {
+            throw "-PushSprintState requires -CommitSprintState."
+        }
+        Assert-DashboardBranch -Root $DashboardRoot -ExpectedBranch $SprintStateBranch
+        Assert-DashboardCleanBeforeMutation -Root $DashboardRoot
+    }
 
     $config = Get-CheckpointConfig -Root $DashboardRoot
     $configuredValidation = Get-ConfiguredValidationCommand -Config $config -ProjectId $projectId
@@ -160,23 +313,33 @@ try {
     if ([string]::IsNullOrWhiteSpace($CommitSha)) {
         $CommitSha = Invoke-Git -RepoPath $RepositoryPath -Arguments @("rev-parse", "HEAD")
     }
+    Assert-CommitExists -RepoPath $RepositoryPath -Sha $CommitSha
     $commitMessage = Invoke-Git -RepoPath $RepositoryPath -Arguments @("log", "-1", "--pretty=%s", $CommitSha)
     $dirtyStatus = Invoke-Git -RepoPath $RepositoryPath -Arguments @("status", "--porcelain")
     $isDirty = -not [string]::IsNullOrWhiteSpace($dirtyStatus)
     if ($isDirty -and -not $AllowDirty) {
         throw "Working tree is dirty. Commit or clean changes first, or rerun with -AllowDirty for an evidence-only checkpoint."
     }
+    if ($isAutomaticCompletion) {
+        Assert-GitDiffCheck -RepoPath $RepositoryPath
+        Assert-BranchSynchronized -RepoPath $RepositoryPath -RemoteName $ExpectedRemote
+    }
 
     $validationSummary = "Skipped by -SkipValidation."
     if (-not $SkipValidation) {
+        if ($isAutomaticCompletion -and [string]::IsNullOrWhiteSpace($ValidationCommand)) {
+            throw "Automatic completion to done requires a configured or supplied validation command."
+        }
         $validationSummary = Invoke-ValidationCommand -RepoPath $RepositoryPath -Command $ValidationCommand
+        if ($isAutomaticCompletion -and $validationSummary -eq "No validation command configured.") {
+            throw "Automatic completion to done requires a real validation command."
+        }
     }
 
     $timestamp = (Get-Date).ToUniversalTime().ToString("o")
     $repoName = Split-Path -Leaf $gitRoot
     if ([string]::IsNullOrWhiteSpace($UpdateId)) {
         $shortCommit = if ($CommitSha.Length -ge 12) { $CommitSha.Substring(0, 12) } else { $CommitSha }
-        $target = if ([string]::IsNullOrWhiteSpace($checkpointId)) { $taskId } else { $checkpointId }
         $UpdateId = "$projectId-$target-$normalizedStatus-$shortCommit"
     }
 
@@ -236,6 +399,30 @@ try {
         & $python scripts/process_sprint_updates.py $processorMode --file $pendingPath
         if ($LASTEXITCODE -ne 0) {
             throw "Sprint update processor failed with exit code $LASTEXITCODE."
+        }
+
+        if ($CommitSprintState -or $PushSprintState) {
+            Assert-DashboardChangesExpected -Root $DashboardRoot
+            Invoke-DashboardValidation -Root $DashboardRoot -Python $python
+            & git add roadmap/current_sprint.yaml roadmap/updates/processed roadmap/updates/rejected
+            if ($LASTEXITCODE -ne 0) {
+                throw "git add failed for RYSEN-LABS sprint-state files."
+            }
+            $commitMessage = "Update sprint checkpoint $target"
+            if ($CommitSprintState) {
+                & git commit -m $commitMessage
+                if ($LASTEXITCODE -ne 0) {
+                    throw "git commit failed for RYSEN-LABS sprint-state update."
+                }
+                $dashboardCommit = Invoke-Git -RepoPath $DashboardRoot -Arguments @("rev-parse", "HEAD")
+                Write-Host "RYSEN-LABS sprint-state commit: $dashboardCommit"
+            }
+            if ($PushSprintState) {
+                & git push $ExpectedRemote $SprintStateBranch
+                if ($LASTEXITCODE -ne 0) {
+                    throw "git push failed for RYSEN-LABS sprint-state update."
+                }
+            }
         }
     }
     finally {

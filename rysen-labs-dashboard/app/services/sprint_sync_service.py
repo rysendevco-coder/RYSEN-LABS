@@ -125,6 +125,50 @@ def _recommendation_status(update: SprintUpdatePayload) -> SprintTaskStatus | No
     return None
 
 
+def _evidence_mapping(update: SprintUpdatePayload) -> dict[str, str]:
+    evidence = update.evidence
+    if evidence is None:
+        return {}
+    if isinstance(evidence, str):
+        return {"other": evidence}
+    if hasattr(evidence, "model_dump"):
+        return {
+            str(key): str(value)
+            for key, value in evidence.model_dump(exclude_none=True).items()
+            if value is not None and str(value).strip()
+        }
+    if isinstance(evidence, dict):
+        return {
+            str(key): str(value)
+            for key, value in evidence.items()
+            if value is not None and str(value).strip()
+        }
+    return {}
+
+
+def _validate_completion_evidence(update: SprintUpdatePayload, status: SprintTaskStatus | None) -> None:
+    if status != SprintTaskStatus.DONE:
+        return
+    evidence = _evidence_mapping(update)
+    if not evidence:
+        raise SprintSyncError("completion updates require objective validation evidence")
+    validation = evidence.get("validation", "").strip().lower()
+    if validation in {"no validation command configured.", "no validation command configured"}:
+        raise SprintSyncError("completion updates require a real validation command or test evidence")
+    if validation.startswith("skipped by"):
+        raise SprintSyncError("completion updates cannot use skipped validation as evidence")
+
+
+def _source_commit_sha(update: SprintUpdatePayload) -> str | None:
+    evidence = _evidence_mapping(update)
+    commit = evidence.get("commit")
+    return commit.strip() if commit and commit.strip() else None
+
+
+def _registered_projects(settings: Settings) -> dict[str, ProjectConfig]:
+    return _load_projects(settings.projects_config_path)
+
+
 def _archive_path(directory: Path, update_id: str, source: Path) -> Path:
     directory.mkdir(parents=True, exist_ok=True)
     clean_id = "".join(char for char in update_id if char.isalnum() or char in {"-", "_"}) or "update"
@@ -164,7 +208,7 @@ class SprintUpdateInboxService:
                     continue
         return ids
 
-    def validate_update(self, path: Path) -> tuple[str, SprintUpdatePayload, SprintTaskStatus | None]:
+    def _parse_update(self, path: Path) -> tuple[str, SprintUpdatePayload, SprintTaskStatus | None]:
         raw = _load_structured_file(path)
         normalized = _normal_update_payload(raw)
         update_id = _stable_update_id(normalized)
@@ -175,10 +219,16 @@ class SprintUpdateInboxService:
 
         update = parsed.sprint_update
         recommended_status = _recommendation_status(update)
-        projects = _load_projects(self.settings.projects_config_path)
+        _validate_completion_evidence(update, recommended_status)
+        projects = _registered_projects(self.settings)
         if update.project not in projects:
             raise SprintSyncError(f"Unknown project '{update.project}'")
+        return update_id, update, recommended_status
 
+    def validate_update(self, path: Path) -> tuple[str, SprintUpdatePayload, SprintTaskStatus | None]:
+        update_id, update, recommended_status = self._parse_update(path)
+        if update.activity_only:
+            return update_id, update, recommended_status
         sprint_payload = _read_yaml_mapping(self.settings.current_sprint_config_path, "current sprint")
         _validate_checkpoint_totals(sprint_payload)
         tasks = _tasks_by_id(sprint_payload)
@@ -205,11 +255,13 @@ class SprintUpdateInboxService:
                 checkpoint=update.checkpoint,
                 result=update.result,
                 recommended_status=recommended_status,
+                activity_only=update.activity_only,
+                source_commit_sha=_source_commit_sha(update),
                 applied=False,
                 already_processed=duplicate,
                 source_file=str(source),
             )
-            if apply and not duplicate:
+            if apply and not duplicate and not update.activity_only:
                 self._apply_status(update, recommended_status)
                 record.applied = True
             if apply:
@@ -258,7 +310,9 @@ class SprintUpdateInboxService:
                     checkpoint=update.checkpoint,
                     result=update.result,
                     recommended_status=recommended_status,
-                    applied=True,
+                    activity_only=update.activity_only,
+                    source_commit_sha=_source_commit_sha(update),
+                    applied=not update.activity_only,
                     source_file=str(path),
                     archived_file=str(path),
                     processed_at=datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc),
@@ -279,6 +333,8 @@ class SprintUpdateInboxService:
                     project=project_id,
                     last_update_time=latest.processed_at if latest else None,
                     last_processed_checkpoint=latest.checkpoint if latest else None,
+                    latest_verified_status=latest.recommended_status if latest else None,
+                    latest_source_commit_sha=latest.source_commit_sha if latest else None,
                     update_count=len(project_updates),
                 ),
             )

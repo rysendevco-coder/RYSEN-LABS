@@ -162,7 +162,26 @@ Use the PowerShell checkpoint workflow to validate a project checkpoint, capture
 
 See `docs/CHECKPOINT_WORKFLOW.md`.
 
-Registered sprint projects include Rip or Vault, MotorMinder, PBCT, Rysen Labs Infrastructure, and Lunch Roulette. Lunch Roulette uses project ID `lunch-roulette` and canonical branch `main`. Registration makes the project ID valid for Sprint Update / Auto-Sync evidence, but Lunch Roulette has no Sprint 01 tasks; updates for nonexistent active-sprint tasks are intentionally rejected until future sprint scope is added.
+Sprint Auto-Sync V1.2 can commit and push an authorized sprint-state update after the project checkpoint has been validated, committed, pushed, and confirmed synchronized:
+
+```powershell
+.\scripts\checkpoint.ps1 `
+  -Project rip-or-vault `
+  -Task rov-002 `
+  -Checkpoint rov-002-e `
+  -Status done `
+  -RepositoryPath ..\rip-or-vault `
+  -ValidationCommand ".\validate.ps1" `
+  -Apply `
+  -CommitSprintState `
+  -PushSprintState
+```
+
+Automatic completion to `done` stops if validation is missing, skipped, or failed; if the project repository is dirty; if `git diff --check` fails; if the checkpoint commit is missing; or if the project branch is not synchronized with its upstream.
+
+For verified work outside the active sprint, use `activity_only: true` in the `sprint_update`. Activity-only updates are archived and surfaced as latest project activity, but they do not modify `current_sprint.yaml` or change sprint percentages.
+
+Registered sprint projects include Rip or Vault, MotorMinder, PBCT, Rysen Labs Infrastructure, and Lunch Roulette. Lunch Roulette uses project ID `lunch-roulette` and canonical branch `main`. Registration makes the project ID valid for Sprint Update / Auto-Sync evidence, but Lunch Roulette has no Sprint 01 tasks; status-changing updates for nonexistent active-sprint tasks are intentionally rejected until future sprint scope is added.
 
 Lunch Roulette Checkpoint 8, "Real Google Places Restaurant Provider", completed outside Sprint 01 with commit `4b882661e9f9d652c7b9852865a433011108e59a`. Its evidence is project history only and does not change Sprint 01 points or progress. Recommended Sprint 02 candidate: "Lunch Roulette - Checkpoint 9 - Final Recommendation UX + Live Places Smoke Test."
 
@@ -173,6 +192,16 @@ python scripts/snapshot_sprint.py
 ```
 
 To start a new sprint, copy the previous `roadmap/current_sprint.yaml` into `roadmap/history/`, then edit `current_sprint.yaml` with the new sprint name, date range, objective, and task list. See `docs/SPRINT_SYSTEM.md`.
+
+Host-side ZimaBoard sync artifacts are included but not installed:
+
+```text
+scripts/zima_sync.sh
+deploy/systemd/rysen-labs-dashboard-sync.service
+deploy/systemd/rysen-labs-dashboard-sync.timer
+```
+
+The sync script fetches `origin`, fast-forwards only a clean approved branch, refuses dirty or non-fast-forward states, and never restarts or rebuilds Docker. Install and enable the service/timer only after explicit deployment authorization.
 
 ## Environment Variables
 

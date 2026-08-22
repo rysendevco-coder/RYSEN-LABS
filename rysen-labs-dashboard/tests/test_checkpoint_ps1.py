@@ -31,6 +31,11 @@ def _write_git_repo(path: Path) -> str:
     (path / "README.md").write_text("# checkpoint fixture\n", encoding="utf-8")
     _git(["add", "README.md"], path)
     _git(["commit", "-m", "Fixture checkpoint"], path)
+    remote = path.parent / f"{path.name}.git"
+    _git(["init", "--bare", str(remote)], path.parent)
+    _git(["remote", "add", "origin", str(remote)], path)
+    branch = _git(["branch", "--show-current"], path)
+    _git(["push", "-u", "origin", branch], path)
     return _git(["rev-parse", "HEAD"], path)
 
 
@@ -76,7 +81,7 @@ def test_checkpoint_ps1_valid_apply_updates_data_and_captures_git_metadata(tmp_p
     repo = tmp_path / "project"
     commit = _write_git_repo(repo)
 
-    result = _run_checkpoint(settings, repo, "-SkipValidation", "-Apply")
+    result = _run_checkpoint(settings, repo, "-Apply", validation_command="Write-Output validation-ok")
 
     assert result.returncode == 0, result.stderr
     sprint = SprintService(settings).load_sprint()
@@ -95,8 +100,8 @@ def test_checkpoint_ps1_duplicate_execution_is_idempotent(tmp_path: Path) -> Non
     repo = tmp_path / "project"
     _write_git_repo(repo)
 
-    first = _run_checkpoint(settings, repo, "-SkipValidation", "-Apply")
-    second = _run_checkpoint(settings, repo, "-SkipValidation", "-Apply")
+    first = _run_checkpoint(settings, repo, "-Apply", validation_command="Write-Output validation-ok")
+    second = _run_checkpoint(settings, repo, "-Apply", validation_command="Write-Output validation-ok")
 
     assert first.returncode == 0, first.stderr
     assert second.returncode == 0, second.stderr
@@ -131,7 +136,8 @@ def test_checkpoint_ps1_invalid_project_fails_safely(tmp_path: Path) -> None:
             str(ROOT),
             "-PythonExe",
             sys.executable,
-            "-SkipValidation",
+            "-ValidationCommand",
+            "Write-Output validation-ok",
             "-Apply",
         ],
         cwd=ROOT,
@@ -159,11 +165,52 @@ def test_checkpoint_ps1_failed_validation_does_not_write_update(tmp_path: Path) 
     assert not list((settings.sprint_updates_dir / "processed").glob("*.json"))
 
 
+def test_checkpoint_ps1_missing_validation_blocks_automatic_done(tmp_path: Path) -> None:
+    settings = _write_fixture(tmp_path)
+    repo = tmp_path / "project"
+    _write_git_repo(repo)
+
+    result = _run_checkpoint(settings, repo, "-Apply")
+
+    assert result.returncode == 1
+    assert "requires a configured or supplied validation command" in result.stderr
+    assert SprintService(settings).load_sprint().progress.completed_points == 0
+    assert not list((settings.sprint_updates_dir / "pending").glob("*.json"))
+
+
+def test_checkpoint_ps1_dirty_source_repo_blocks_automatic_completion(tmp_path: Path) -> None:
+    settings = _write_fixture(tmp_path)
+    repo = tmp_path / "project"
+    _write_git_repo(repo)
+    (repo / "README.md").write_text("# dirty checkpoint fixture\n", encoding="utf-8")
+
+    result = _run_checkpoint(settings, repo, "-Apply", validation_command="Write-Output validation-ok")
+
+    assert result.returncode == 1
+    assert "Working tree is dirty" in result.stderr
+    assert SprintService(settings).load_sprint().progress.completed_points == 0
+
+
+def test_checkpoint_ps1_unsynchronized_source_repo_blocks_automatic_completion(tmp_path: Path) -> None:
+    settings = _write_fixture(tmp_path)
+    repo = tmp_path / "project"
+    _write_git_repo(repo)
+    (repo / "CHANGELOG.md").write_text("# local only\n", encoding="utf-8")
+    _git(["add", "CHANGELOG.md"], repo)
+    _git(["commit", "-m", "Unpushed checkpoint"], repo)
+
+    result = _run_checkpoint(settings, repo, "-Apply", validation_command="Write-Output validation-ok")
+
+    assert result.returncode == 1
+    assert "Project branch" in result.stderr
+    assert SprintService(settings).load_sprint().progress.completed_points == 0
+
+
 def test_checkpoint_ps1_reopened_task_recalculates_progress(tmp_path: Path) -> None:
     settings = _write_fixture(tmp_path)
     repo = tmp_path / "project"
     _write_git_repo(repo)
-    done = _run_checkpoint(settings, repo, "-SkipValidation", "-Apply")
+    done = _run_checkpoint(settings, repo, "-Apply", validation_command="Write-Output validation-ok")
     assert done.returncode == 0, done.stderr
 
     reopen = _run_checkpoint(
@@ -181,3 +228,24 @@ def test_checkpoint_ps1_reopened_task_recalculates_progress(tmp_path: Path) -> N
     assert reopen.returncode == 0, reopen.stderr
     assert task["checkpoints"][0]["status"] == "todo"
     assert SprintService(settings).load_sprint().progress.completed_points == 0
+
+
+def test_zima_sync_script_uses_safe_fast_forward_only() -> None:
+    script = (ROOT / "scripts" / "zima_sync.sh").read_text(encoding="utf-8")
+
+    assert "status --porcelain" in script
+    assert "merge --ff-only" in script
+    assert "refusing sync: working tree is dirty" in script
+    assert "cannot fast-forward" in script
+    assert "reset --hard" not in script
+    assert "docker" not in script.lower()
+
+
+def test_checkpoint_ps1_commit_state_mode_has_dashboard_guards() -> None:
+    script = (ROOT / "scripts" / "checkpoint.ps1").read_text(encoding="utf-8")
+
+    assert "Assert-DashboardCleanBeforeMutation" in script
+    assert "Assert-DashboardChangesExpected" in script
+    assert "Invoke-DashboardValidation" in script
+    assert "git commit -m" in script
+    assert "git push" in script

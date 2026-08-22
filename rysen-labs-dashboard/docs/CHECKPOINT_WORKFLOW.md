@@ -28,6 +28,21 @@ Apply the recommended status change when explicitly authorized:
   -Apply
 ```
 
+Commit and push the resulting RYSEN-LABS sprint-state update when explicitly authorized:
+
+```powershell
+.\scripts\checkpoint.ps1 `
+  -Project rip-or-vault `
+  -Task rov-002 `
+  -Checkpoint rov-002-e `
+  -Status done `
+  -RepositoryPath ..\rip-or-vault `
+  -ValidationCommand ".\validate.ps1" `
+  -Apply `
+  -CommitSprintState `
+  -PushSprintState
+```
+
 ## Parameters
 
 - `Project`: roadmap project ID, such as `rip-or-vault`.
@@ -38,6 +53,8 @@ Apply the recommended status change when explicitly authorized:
 - `ValidationCommand`: optional command run from `RepositoryPath`.
 - `SkipValidation`: skips validation and records that fact.
 - `Apply`: applies the update through `scripts/process_sprint_updates.py`.
+- `CommitSprintState`: after a valid apply, runs dashboard validation and commits only the authorized status/audit change.
+- `PushSprintState`: pushes the committed dashboard sprint-state change to the approved remote branch.
 - `AllowDirty`: permits evidence capture from a dirty working tree.
 - `CommitSha`: records a specific commit instead of current `HEAD`.
 - `UpdateId`: explicit idempotency key.
@@ -46,13 +63,13 @@ Apply the recommended status change when explicitly authorized:
 
 Project defaults live in `config/checkpoints.json`.
 
-Each project can define a `validation_command`. The script uses that command unless `-ValidationCommand` is supplied. Empty validation commands are allowed for projects that do not yet have a standardized validation hook.
+Each project can define a `validation_command`. The script uses that command unless `-ValidationCommand` is supplied. Empty validation commands are allowed for evidence-only or non-completion updates, but automatic completion to `done` requires a real supplied or configured validation command.
 
 ## Git Behavior
 
 The checkpoint script records an existing commit. It does not create commits, push, reset, clean, checkout, merge, rebase, or force any Git state.
 
-By default, the working tree must be clean before a checkpoint can be marked successful. Use `-AllowDirty` only for evidence-only updates where dirty state is intentional.
+By default, the working tree must be clean before a checkpoint can be marked successful. Use `-AllowDirty` only for evidence-only updates where dirty state is intentional. Automatic completion to `done` also runs `git diff --check`, verifies the commit exists, fetches the expected remote, and requires the current branch to be synchronized with its upstream.
 
 Captured metadata includes:
 
@@ -89,11 +106,16 @@ The Sprint Update Inbox treats an already processed update ID as idempotent and 
 
 The script exits non-zero when:
 
+- automatic completion to `done` has no real validation command
+- automatic completion to `done` uses `-SkipValidation` or `-AllowDirty`
 - validation fails
 - Git metadata cannot be read
 - the working tree is dirty without `-AllowDirty`
+- `git diff --check` fails
+- the source branch is not synchronized with its upstream
 - the inbox processor rejects the update
 - the project, task, checkpoint, or status is invalid
+- the RYSEN-LABS dashboard diff contains anything beyond the requested `status` change and audit files
 
 Failed validation does not write a pending update file. Rejected apply attempts are archived under `roadmap/updates/rejected/`.
 

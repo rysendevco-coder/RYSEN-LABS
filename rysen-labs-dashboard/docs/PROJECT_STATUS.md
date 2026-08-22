@@ -18,6 +18,9 @@ Current version: 0.3.0
 - Mobile-first dark command-center UI.
 - Sprint update inbox for validated project evidence files.
 - PowerShell checkpoint workflow for Git metadata capture and inbox update generation.
+- Sprint Auto-Sync V1.2 checkpoint transaction support for verified apply, commit, and push.
+- Repository-managed ZimaBoard safe fast-forward sync script and systemd service/timer templates.
+- Evidence-only project activity records for verified out-of-sprint checkpoints without changing sprint math.
 - Daily sprint snapshot command.
 - Structured morning brief endpoint.
 - Local test suite that does not require Docker or ZimaBoard access.
@@ -85,6 +88,7 @@ The warning comes from FastAPI/Starlette test client dependency guidance.
 - No authentication yet.
 - No database persistence.
 - Historical sprint snapshots are command-generated only; no scheduler is installed.
+- ZimaBoard sync artifacts are prepared but not installed or enabled.
 - Health checks are point-in-time checks only.
 - Docker inspection is optional and disabled by default.
 - Git inspection is optional and disabled by default.

@@ -46,6 +46,8 @@ def main() -> int:
         print(f"task: {record.task}")
         print(f"checkpoint: {record.checkpoint or ''}")
         print(f"recommended_status: {record.recommended_status or ''}")
+        print(f"activity_only: {record.activity_only}")
+        print(f"source_commit_sha: {record.source_commit_sha or ''}")
         print(f"applied: {record.applied}")
         print(f"already_processed: {record.already_processed}")
         if record.validation_error:

@@ -1,0 +1,12 @@
+[Unit]
+Description=Run Rysen Labs Dashboard safe sync every five minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Persistent=true
+Unit=rysen-labs-dashboard-sync.service
+
+[Install]
+WantedBy=timers.target

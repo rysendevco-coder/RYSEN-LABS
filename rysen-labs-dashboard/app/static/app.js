@@ -169,6 +169,7 @@
       for (const [label, value] of [
         ["Progress", `${project.progress.progress_percentage}%`],
         ["Points", `${project.progress.completed_points} / ${project.progress.total_points}`],
+        ["Latest", project.last_processed_checkpoint || "N/A"],
       ]) {
         const group = document.createElement("div");
         group.append(createTextElement("dt", "", label), createTextElement("dd", "", value));
@@ -215,7 +216,7 @@
       item.append(
         createTextElement("span", "category", update.project),
         createTextElement("strong", "", update.checkpoint || update.task),
-        createTextElement("p", "", `${update.recommended_status || "recommended"} - ${update.result}`),
+        createTextElement("p", "", `${update.activity_only ? "activity" : (update.recommended_status || "recommended")} - ${update.result}`),
         createTextElement("small", "", `Processed: ${update.processed_at ? formatTime(update.processed_at) : "unknown"}`),
       );
       recentUpdates.append(item);

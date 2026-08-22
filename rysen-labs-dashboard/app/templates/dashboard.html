@@ -105,6 +105,7 @@
             <dl class="health-details">
               <div><dt>Progress</dt><dd>{{ project.progress.progress_percentage }}%</dd></div>
               <div><dt>Points</dt><dd>{{ project.progress.completed_points }} / {{ project.progress.total_points }}</dd></div>
+              <div><dt>Latest</dt><dd>{{ project.last_processed_checkpoint or "N/A" }}</dd></div>
             </dl>
           </article>
           {% endfor %}
@@ -135,7 +136,7 @@
               <article class="update-item">
                 <span class="category">{{ update.project }}</span>
                 <strong>{{ update.checkpoint or update.task }}</strong>
-                <p>{{ update.recommended_status or "recommended" }} - {{ update.result }}</p>
+                <p>{{ "activity" if update.activity_only else (update.recommended_status or "recommended") }} - {{ update.result }}</p>
                 <small>Processed: {{ update.processed_at or "unknown" }}</small>
               </article>
               {% endfor %}

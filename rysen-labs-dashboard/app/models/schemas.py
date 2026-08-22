@@ -254,6 +254,7 @@ class SprintUpdatePayload(BaseModel):
     result: str
     evidence: SprintUpdateEvidence | dict[str, str] | str | None = None
     recommendation: SprintUpdateRecommendation | dict[str, str] | str | None = None
+    activity_only: bool = False
 
     @field_validator("project", "task", "checkpoint")
     @classmethod
@@ -280,6 +281,8 @@ class SprintUpdateRecord(BaseModel):
     checkpoint: str | None = None
     result: str
     recommended_status: SprintTaskStatus | None = None
+    activity_only: bool = False
+    source_commit_sha: str | None = None
     applied: bool = False
     already_processed: bool = False
     validation_error: str | None = None
@@ -292,6 +295,8 @@ class ProjectSprintSyncSummary(BaseModel):
     project: str
     last_update_time: datetime | None = None
     last_processed_checkpoint: str | None = None
+    latest_verified_status: SprintTaskStatus | None = None
+    latest_source_commit_sha: str | None = None
     update_count: int = 0
 
 
@@ -305,6 +310,11 @@ class ProjectSprintSummary(BaseModel):
     blockers: list[SprintTask] = Field(default_factory=list)
     tasks: list[SprintTask] = Field(default_factory=list)
     progress: SprintProgress
+    last_update_time: datetime | None = None
+    last_processed_checkpoint: str | None = None
+    latest_verified_status: SprintTaskStatus | None = None
+    latest_source_commit_sha: str | None = None
+    update_count: int = 0
     display_order: int = 100
 
 

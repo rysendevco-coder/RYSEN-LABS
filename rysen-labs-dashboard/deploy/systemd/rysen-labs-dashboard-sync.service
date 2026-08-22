@@ -1,0 +1,12 @@
+[Unit]
+Description=Rysen Labs Dashboard safe Git fast-forward sync
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/rysen-labs-dashboard
+Environment=RYSEN_DASHBOARD_DIR=/opt/rysen-labs-dashboard
+Environment=RYSEN_DASHBOARD_REMOTE=origin
+Environment=RYSEN_DASHBOARD_BRANCH=develop
+ExecStart=/opt/rysen-labs-dashboard/scripts/zima_sync.sh

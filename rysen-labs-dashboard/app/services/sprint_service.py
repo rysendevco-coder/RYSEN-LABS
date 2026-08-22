@@ -189,8 +189,18 @@ class SprintService:
             if task.project not in known_projects:
                 errors.append(f"Sprint task '{task.id}' references unknown project '{task.project}'")
 
+        sync = SprintUpdateInboxService(self.settings)
+        project_ids = [project.id for project in projects]
+        sync_by_project = {
+            summary.project: summary
+            for summary in sync.project_freshness(project_ids)
+        }
         project_summaries = [
-            self._project_summary(project, [task for task in tasks if task.project == project.id])
+            self._project_summary(
+                project,
+                [task for task in tasks if task.project == project.id],
+                sync_by_project.get(project.id),
+            )
             for project in projects
         ]
         needs_attention = [
@@ -203,8 +213,6 @@ class SprintService:
         progress = calculate_progress(tasks)
         start = _parse_sprint_date(payload.get("start_date"))
         end = _parse_sprint_date(payload.get("end_date"))
-        sync = SprintUpdateInboxService(self.settings)
-        project_ids = [project.id for project in projects]
         return SprintSummary(
             name=str(payload.get("name", "No active sprint")),
             start_date=str(payload.get("start_date", "")),
@@ -222,11 +230,16 @@ class SprintService:
             progress=progress,
             schedule=calculate_schedule(progress, start, end, as_of or date.today()),
             recent_updates=sync.recent_processed_updates(),
-            sync_projects=sync.project_freshness(project_ids),
+            sync_projects=list(sync_by_project.values()),
             config_errors=errors,
         )
 
-    def _project_summary(self, project: ProjectConfig, tasks: list[SprintTask]) -> ProjectSprintSummary:
+    def _project_summary(
+        self,
+        project: ProjectConfig,
+        tasks: list[SprintTask],
+        sync: Any | None = None,
+    ) -> ProjectSprintSummary:
         return ProjectSprintSummary(
             id=project.id,
             name=project.name,
@@ -237,6 +250,11 @@ class SprintService:
             blockers=[task for task in tasks if _task_is_blocked(task)],
             tasks=tasks,
             progress=calculate_progress(tasks),
+            last_update_time=sync.last_update_time if sync else None,
+            last_processed_checkpoint=sync.last_processed_checkpoint if sync else None,
+            latest_verified_status=sync.latest_verified_status if sync else None,
+            latest_source_commit_sha=sync.latest_source_commit_sha if sync else None,
+            update_count=sync.update_count if sync else 0,
             display_order=project.display_order,
         )
 
