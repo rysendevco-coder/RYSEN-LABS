@@ -99,6 +99,10 @@ The backend does not generate AI prose.
 3. Have the project repo emit `sprint_update` files with the same standard shape.
 4. Process updates through this dashboard repo; do not write directly to `current_sprint.yaml` from project repos.
 
+Project registration and active sprint membership are separate. A registered project ID is valid for evidence intake, but an update is applied only when the referenced task/checkpoint exists in `roadmap/current_sprint.yaml`.
+
+Lunch Roulette is registered as `lunch-roulette` on canonical branch `main`. Checkpoint 8, "Real Google Places Restaurant Provider", completed outside Sprint 01 at commit `4b882661e9f9d652c7b9852865a433011108e59a` and should be treated as historical evidence, not retroactive Sprint 01 scope. Recommended future sprint candidate: "Lunch Roulette - Checkpoint 9 - Final Recommendation UX + Live Places Smoke Test."
+
 ## Safe Update Utility
 
 Use `scripts/update_sprint.py` only when sprint-state modification is explicitly authorized.

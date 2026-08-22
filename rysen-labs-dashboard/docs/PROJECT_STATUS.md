@@ -22,6 +22,34 @@ Current version: 0.3.0
 - Structured morning brief endpoint.
 - Local test suite that does not require Docker or ZimaBoard access.
 
+## Managed Projects
+
+- Rip or Vault / Collector Command Center (`rip-or-vault`)
+- MotorMinder (`motorminder`)
+- Powered by Christ & Turbos (`pbct`)
+- Rysen Labs Infrastructure (`rysen-labs-infrastructure`)
+- Lunch Roulette (`lunch-roulette`)
+
+Lunch Roulette is registered for centralized Sprint Update / Auto-Sync evidence intake. Its canonical development branch is `main`.
+
+## Project History
+
+Lunch Roulette Checkpoint 8, "Real Google Places Restaurant Provider", completed outside Sprint 01 tracking and should not be added retroactively to Sprint 01 totals. Verified evidence:
+
+- Commit: `4b882661e9f9d652c7b9852865a433011108e59a`
+- Remote: `origin/main`
+- Git divergence after completion: `0 / 0`
+- JVM tests: `91 passed`
+- `lintDebug`: passed
+- `assembleDebug`: passed
+- `assembleDebugAndroidTest`: passed
+- `git diff --check`: passed
+- Credential scan: clear
+- Merged manifest: coarse location only
+- Live Places smoke test: not yet performed
+
+Recommended Sprint 02 candidate: Lunch Roulette - Checkpoint 9 - Final Recommendation UX + Live Places Smoke Test. Suggested scope is polishing the selected restaurant recommendation/result experience, preserving the app as a roulette/recommendation tool, and validating real-device Places behavior with a properly restricted debug key.
+
 ## Architecture Summary
 
 The application is organized around small services and route modules. Configuration, app registry loading, Docker inspection, system metrics, health checks, status assembly, SSE formatting, and FastAPI routes are separate modules.

@@ -162,6 +162,10 @@ Use the PowerShell checkpoint workflow to validate a project checkpoint, capture
 
 See `docs/CHECKPOINT_WORKFLOW.md`.
 
+Registered sprint projects include Rip or Vault, MotorMinder, PBCT, Rysen Labs Infrastructure, and Lunch Roulette. Lunch Roulette uses project ID `lunch-roulette` and canonical branch `main`. Registration makes the project ID valid for Sprint Update / Auto-Sync evidence, but Lunch Roulette has no Sprint 01 tasks; updates for nonexistent active-sprint tasks are intentionally rejected until future sprint scope is added.
+
+Lunch Roulette Checkpoint 8, "Real Google Places Restaurant Provider", completed outside Sprint 01 with commit `4b882661e9f9d652c7b9852865a433011108e59a`. Its evidence is project history only and does not change Sprint 01 points or progress. Recommended Sprint 02 candidate: "Lunch Roulette - Checkpoint 9 - Final Recommendation UX + Live Places Smoke Test."
+
 Create or refresh a daily sprint snapshot with:
 
 ```powershell

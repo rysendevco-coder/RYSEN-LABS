@@ -16,7 +16,7 @@ def test_sprint_yaml_loading() -> None:
 
     assert sprint.name == "Sprint 01 - Ship Something"
     assert sprint.date_label == "Aug 10 - Aug 23, 2026"
-    assert len(sprint.projects) == 4
+    assert len(sprint.projects) == 5
     assert sprint.revenue_goal.description == "First $1 of recurring software revenue"
 
 
@@ -160,6 +160,19 @@ def test_current_sprint_project_progress() -> None:
     assert projects["rysen-labs-infrastructure"].progress.total_points == 5
     assert projects["rysen-labs-infrastructure"].progress.completed_points == 4
     assert projects["rysen-labs-infrastructure"].progress.progress_percentage == 80.0
+    assert projects["lunch-roulette"].progress.total_points == 0
+    assert projects["lunch-roulette"].progress.completed_points == 0
+    assert projects["lunch-roulette"].progress.progress_percentage == 0.0
+
+
+def test_lunch_roulette_registration_does_not_change_sprint_01_progress() -> None:
+    sprint = SprintService(Settings()).load_sprint(as_of=date(2026, 8, 11))
+    projects = {project.id: project for project in sprint.projects}
+
+    assert "lunch-roulette" in projects
+    assert sprint.progress.total_points == 36
+    assert sprint.progress.completed_points == 14
+    assert sprint.progress.progress_percentage == 38.9
 
 
 def test_current_sprint_has_no_blocked_tasks() -> None:

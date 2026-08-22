@@ -31,6 +31,9 @@ projects:
   - id: motorminder
     name: MotorMinder
     short_name: MM
+  - id: lunch-roulette
+    name: Lunch Roulette
+    short_name: LUNCH ROULETTE
 """,
         encoding="utf-8",
     )
@@ -134,6 +137,21 @@ def test_unknown_project_task_checkpoint_and_invalid_status(tmp_path: Path) -> N
         path = _write_update(settings.sprint_updates_dir / "pending" / f"bad-{index}.yaml", **overrides)
         record = inbox.process_file(path, apply=False)
         assert record.validation_error
+
+
+def test_registered_project_without_active_sprint_task_is_rejected_by_task(tmp_path: Path) -> None:
+    settings = _write_fixture(tmp_path)
+    path = _write_update(
+        settings.sprint_updates_dir / "pending" / "lunch-roulette.yaml",
+        update_id="lunch-roulette-checkpoint-8",
+        project="lunch-roulette",
+        task="lr-009",
+        checkpoint="lr-009-a",
+    )
+
+    record = SprintUpdateInboxService(settings).process_file(path, apply=False)
+
+    assert record.validation_error == "Unknown task 'lr-009'"
 
 
 def test_dry_run_does_not_mutate_state_or_move_file(tmp_path: Path) -> None:

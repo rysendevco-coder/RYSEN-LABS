@@ -103,6 +103,7 @@ def test_sprint_brief_endpoint() -> None:
         "motorminder",
         "pbct",
         "rysen-labs-infrastructure",
+        "lunch-roulette",
     ]
     assert payload["blockers"] == []
     assert payload["next_incomplete_checkpoints"]
@@ -120,4 +121,10 @@ def test_projects_endpoint() -> None:
         "motorminder",
         "pbct",
         "rysen-labs-infrastructure",
+        "lunch-roulette",
     ]
+
+    lunch_roulette = payload[-1]
+    assert lunch_roulette["id"] == "lunch-roulette"
+    assert lunch_roulette["progress"]["total_points"] == 0
+    assert lunch_roulette["progress"]["completed_points"] == 0

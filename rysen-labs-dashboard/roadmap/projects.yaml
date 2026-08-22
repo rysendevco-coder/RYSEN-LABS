@@ -22,3 +22,9 @@ projects:
     short_name: RYSEN LABS
     description: Local infrastructure, dashboard, deployment, and operating system work.
     display_order: 40
+
+  - id: lunch-roulette
+    name: Lunch Roulette
+    short_name: LUNCH ROULETTE
+    description: Location-aware restaurant roulette and recommendation app.
+    display_order: 50
