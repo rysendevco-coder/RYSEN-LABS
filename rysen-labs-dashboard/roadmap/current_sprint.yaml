@@ -31,7 +31,7 @@ tasks:
       - id: rov-002-b
         name: Product selection and metadata population flow
         points: 1
-        status: in_progress
+        status: done
       - id: rov-002-c
         name: Pricing/market-value population and reset behavior
         points: 1
@@ -43,7 +43,7 @@ tasks:
       - id: rov-002-e
         name: Result presentation and error/empty-state behavior
         points: 1
-        status: todo
+        status: done
       - id: rov-002-f
         name: Full mobile regression of the primary evaluation path
         points: 1

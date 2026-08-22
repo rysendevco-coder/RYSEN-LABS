@@ -1,0 +1,19 @@
+{
+  "update_id": "pbct-about-mission-activity-20260822",
+  "sprint_update": {
+    "project": "pbct",
+    "task": "project-activity",
+    "checkpoint": "apex-about-mission-page-captured",
+    "result": "completed",
+    "activity_only": true,
+    "evidence": {
+      "validation": "PBCT Git history inspection found committed APEX About / Mission region capture; current checkout has a dirty export that was not counted.",
+      "tests": "apex/docs/APEX_ABOUT_MISSION_PAGE_BUILD_STEPS.md and docs/PROJECT_STATUS.md document the captured Page 2 source.",
+      "commit": "562b7da5868c1cb3147979f9045ebe93c5007cb1",
+      "other": "Committed history records Refresh APEX export with About Mission regions."
+    },
+    "recommendation": {
+      "status": "done"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "update_id": "rip-or-vault-d1-decision-engine-activity-20260822",
+  "sprint_update": {
+    "project": "rip-or-vault",
+    "task": "project-activity",
+    "checkpoint": "d1-internal-testing-build",
+    "result": "completed",
+    "activity_only": true,
+    "evidence": {
+      "validation": "Git history inspection found latest committed Rip or Vault state at D1 internal testing build.",
+      "tests": "tests/test_decision_contexts.py and mobile/collector_command_center/test/rip_or_vault_widget_test.dart are present in committed history.",
+      "commit": "82cb40089fa999e189c00bb1ad3b672c301ad69f",
+      "other": "Recent history includes Separate acquisition and ownership decisions and Prepare D1 internal testing build."
+    },
+    "recommendation": {
+      "status": "done"
+    }
+  }
+}

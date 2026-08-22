@@ -32,10 +32,20 @@ Current version: 0.3.0
 - Powered by Christ & Turbos (`pbct`)
 - Rysen Labs Infrastructure (`rysen-labs-infrastructure`)
 - Lunch Roulette (`lunch-roulette`)
+- Organize Me (`organize-me`)
 
 Lunch Roulette is registered for centralized Sprint Update / Auto-Sync evidence intake. Its canonical development branch is `main`.
 
+Organize Me is registered for centralized Sprint Update / Auto-Sync evidence intake. It currently has no Sprint 01 task points.
+
 ## Project History
+
+Rip or Vault / Collector Command Center was reconciled against committed project evidence on 2026-08-22. The following existing Sprint 01 checkpoints were marked done without changing Sprint 01 scope or point totals:
+
+- `rov-002-b` Product selection and metadata population flow. Evidence: Rip or Vault commit `82cb40089fa999e189c00bb1ad3b672c301ad69f`, committed product-selection workflow documentation, API tests, and Flutter widget tests.
+- `rov-002-e` Result presentation and error/empty-state behavior. Evidence: Rip or Vault commit `82cb40089fa999e189c00bb1ad3b672c301ad69f`, committed result presentation documentation, diagnostic/error-state coverage, and API/model parsing tests.
+
+Rip or Vault Decision Engine / D1 internal testing work was also recorded as latest verified activity. Work that did not exactly satisfy an existing Sprint 01 checkpoint was not retroactively added to the sprint.
 
 Lunch Roulette Checkpoint 8, "Real Google Places Restaurant Provider", completed outside Sprint 01 tracking and should not be added retroactively to Sprint 01 totals. Verified evidence:
 
@@ -52,6 +62,12 @@ Lunch Roulette Checkpoint 8, "Real Google Places Restaurant Provider", completed
 - Live Places smoke test: not yet performed
 
 Recommended Sprint 02 candidate: Lunch Roulette - Checkpoint 9 - Final Recommendation UX + Live Places Smoke Test. Suggested scope is polishing the selected restaurant recommendation/result experience, preserving the app as a roulette/recommendation tool, and validating real-device Places behavior with a properly restricted debug key.
+
+MotorMinder's committed Modifications CRUD APEX checkpoint was recorded as latest verified activity at commit `b525c0e976cd92165a8b7f26ba1533095aca95e1`. Newer Garage Files work was visible locally but uncommitted, so it was not counted as verified activity.
+
+PBCT's APEX About / Mission page capture was recorded as latest verified activity at commit `562b7da5868c1cb3147979f9045ebe93c5007cb1`. The current dirty export was not counted as verified activity.
+
+Organize Me's local Android catalog application baseline was recorded as observed activity based on filesystem inspection. No standalone Git commit was available in the inspected project directory, so this is intentionally lower-confidence than committed checkpoint evidence.
 
 ## Architecture Summary
 

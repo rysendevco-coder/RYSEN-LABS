@@ -16,7 +16,7 @@ def test_sprint_yaml_loading() -> None:
 
     assert sprint.name == "Sprint 01 - Ship Something"
     assert sprint.date_label == "Aug 10 - Aug 23, 2026"
-    assert len(sprint.projects) == 5
+    assert len(sprint.projects) == 6
     assert sprint.revenue_goal.description == "First $1 of recurring software revenue"
 
 
@@ -138,8 +138,8 @@ def test_overall_sprint_progress_is_point_weighted() -> None:
     sprint = SprintService(Settings()).load_sprint(as_of=date(2026, 8, 11))
 
     assert sprint.progress.total_points == 36
-    assert sprint.progress.completed_points == 14
-    assert sprint.progress.progress_percentage == 38.9
+    assert sprint.progress.completed_points == 16
+    assert sprint.progress.progress_percentage == 44.4
     assert sprint.schedule.expected_progress_percentage == 7.7
     assert sprint.schedule.schedule_status == ScheduleStatus.AHEAD
 
@@ -149,8 +149,8 @@ def test_current_sprint_project_progress() -> None:
     projects = {project.id: project for project in sprint.projects}
 
     assert projects["rip-or-vault"].progress.total_points == 21
-    assert projects["rip-or-vault"].progress.completed_points == 10
-    assert projects["rip-or-vault"].progress.progress_percentage == 47.6
+    assert projects["rip-or-vault"].progress.completed_points == 12
+    assert projects["rip-or-vault"].progress.progress_percentage == 57.1
     assert projects["motorminder"].progress.total_points == 5
     assert projects["motorminder"].progress.completed_points == 0
     assert projects["motorminder"].progress.progress_percentage == 0.0
@@ -163,16 +163,20 @@ def test_current_sprint_project_progress() -> None:
     assert projects["lunch-roulette"].progress.total_points == 0
     assert projects["lunch-roulette"].progress.completed_points == 0
     assert projects["lunch-roulette"].progress.progress_percentage == 0.0
+    assert projects["organize-me"].progress.total_points == 0
+    assert projects["organize-me"].progress.completed_points == 0
+    assert projects["organize-me"].progress.progress_percentage == 0.0
 
 
-def test_lunch_roulette_registration_does_not_change_sprint_01_progress() -> None:
+def test_activity_only_project_registration_does_not_change_sprint_01_progress() -> None:
     sprint = SprintService(Settings()).load_sprint(as_of=date(2026, 8, 11))
     projects = {project.id: project for project in sprint.projects}
 
     assert "lunch-roulette" in projects
+    assert "organize-me" in projects
     assert sprint.progress.total_points == 36
-    assert sprint.progress.completed_points == 14
-    assert sprint.progress.progress_percentage == 38.9
+    assert sprint.progress.completed_points == 16
+    assert sprint.progress.progress_percentage == 44.4
 
 
 def test_current_sprint_has_no_blocked_tasks() -> None:

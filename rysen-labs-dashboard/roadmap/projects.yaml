@@ -28,3 +28,9 @@ projects:
     short_name: LUNCH ROULETTE
     description: Location-aware restaurant roulette and recommendation app.
     display_order: 50
+
+  - id: organize-me
+    name: Organize Me
+    short_name: ORGANIZE ME
+    description: Android organization/catalog application.
+    display_order: 60

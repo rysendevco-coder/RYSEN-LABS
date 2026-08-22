@@ -16,6 +16,7 @@ This changelog follows a Keep a Changelog-inspired structure.
 - Registered Lunch Roulette as a managed dashboard project for Sprint Update / Auto-Sync evidence intake without altering Sprint 01 scope or progress.
 - Added Sprint Auto-Sync V1.2 transaction safeguards, evidence-only activity records, ZimaBoard safe sync artifacts, and dashboard latest-activity visibility.
 - Corrected ZimaBoard sync service paths to the confirmed `/home/charles/projects/RYSEN-LABS` checkout.
+- Reconciled the living dashboard with current verified project state, registered Organize Me for activity intake, and recorded activity-only baselines without adding Sprint 01 scope.
 
 ## [0.1.0] - 2026-07-10 - Foundation
 

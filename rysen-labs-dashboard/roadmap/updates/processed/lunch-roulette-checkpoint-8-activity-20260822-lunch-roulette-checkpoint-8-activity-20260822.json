@@ -1,0 +1,19 @@
+{
+  "update_id": "lunch-roulette-checkpoint-8-activity-20260822",
+  "sprint_update": {
+    "project": "lunch-roulette",
+    "task": "project-activity",
+    "checkpoint": "checkpoint-8-google-places-provider",
+    "result": "completed",
+    "activity_only": true,
+    "evidence": {
+      "validation": "Canonical Lunch Roulette checkout inspected at origin/main with clean working tree.",
+      "tests": "Checkpoint 8 validation previously recorded: JVM tests, lintDebug, assembleDebug, assembleDebugAndroidTest, git diff --check.",
+      "commit": "4b882661e9f9d652c7b9852865a433011108e59a",
+      "other": "docs/restaurant-discovery-architecture.md documents real Google Places provider implementation and Checkpoint 9 boundary."
+    },
+    "recommendation": {
+      "status": "done"
+    }
+  }
+}

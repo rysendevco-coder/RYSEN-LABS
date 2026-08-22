@@ -15,6 +15,10 @@
     "rysen-labs-infrastructure": {
       "description": "Rysen Labs Infrastructure",
       "validation_command": ".\\.venv\\Scripts\\python.exe -m pytest"
+    },
+    "organize-me": {
+      "description": "Organize Me",
+      "validation_command": ""
     }
   }
 }

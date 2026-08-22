@@ -169,7 +169,7 @@
       for (const [label, value] of [
         ["Progress", `${project.progress.progress_percentage}%`],
         ["Points", `${project.progress.completed_points} / ${project.progress.total_points}`],
-        ["Latest", project.last_processed_checkpoint || "N/A"],
+        ["Latest Activity", project.last_processed_checkpoint || "N/A"],
       ]) {
         const group = document.createElement("div");
         group.append(createTextElement("dt", "", label), createTextElement("dd", "", value));

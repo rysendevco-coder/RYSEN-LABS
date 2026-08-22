@@ -181,9 +181,11 @@ Automatic completion to `done` stops if validation is missing, skipped, or faile
 
 For verified work outside the active sprint, use `activity_only: true` in the `sprint_update`. Activity-only updates are archived and surfaced as latest project activity, but they do not modify `current_sprint.yaml` or change sprint percentages.
 
-Registered sprint projects include Rip or Vault, MotorMinder, PBCT, Rysen Labs Infrastructure, and Lunch Roulette. Lunch Roulette uses project ID `lunch-roulette` and canonical branch `main`. Registration makes the project ID valid for Sprint Update / Auto-Sync evidence, but Lunch Roulette has no Sprint 01 tasks; status-changing updates for nonexistent active-sprint tasks are intentionally rejected until future sprint scope is added.
+Registered sprint projects include Rip or Vault, MotorMinder, PBCT, Rysen Labs Infrastructure, Lunch Roulette, and Organize Me. Lunch Roulette uses project ID `lunch-roulette` and canonical branch `main`. Organize Me uses project ID `organize-me`. Registration makes project IDs valid for Sprint Update / Auto-Sync evidence, but Lunch Roulette and Organize Me have no Sprint 01 tasks; status-changing updates for nonexistent active-sprint tasks are intentionally rejected until future sprint scope is added.
 
 Lunch Roulette Checkpoint 8, "Real Google Places Restaurant Provider", completed outside Sprint 01 with commit `4b882661e9f9d652c7b9852865a433011108e59a`. Its evidence is project history only and does not change Sprint 01 points or progress. Recommended Sprint 02 candidate: "Lunch Roulette - Checkpoint 9 - Final Recommendation UX + Live Places Smoke Test."
+
+The living dashboard distinguishes active Sprint 01 progress from latest verified activity. Activity-only records can show meaningful project movement, such as Lunch Roulette Checkpoint 8 or an Organize Me baseline, without changing Sprint 01 points or schedule health.
 
 Create or refresh a daily sprint snapshot with:
 

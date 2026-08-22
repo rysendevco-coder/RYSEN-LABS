@@ -86,7 +86,7 @@
           <dl class="schedule-details">
             <div><dt>Actual</dt><dd id="sprint-actual-progress">{{ payload.sprint.progress.progress_percentage }}%</dd></div>
             <div><dt>Expected</dt><dd id="sprint-expected-progress">{{ payload.sprint.schedule.expected_progress_percentage }}%</dd></div>
-            <div><dt>Status</dt><dd><span class="status" id="sprint-schedule-status">{{ payload.sprint.schedule.schedule_status }}</span></dd></div>
+            <div><dt>Sprint Schedule</dt><dd><span class="status" id="sprint-schedule-status">{{ payload.sprint.schedule.schedule_status }}</span></dd></div>
           </dl>
         </div>
 
@@ -105,7 +105,7 @@
             <dl class="health-details">
               <div><dt>Progress</dt><dd>{{ project.progress.progress_percentage }}%</dd></div>
               <div><dt>Points</dt><dd>{{ project.progress.completed_points }} / {{ project.progress.total_points }}</dd></div>
-              <div><dt>Latest</dt><dd>{{ project.last_processed_checkpoint or "N/A" }}</dd></div>
+              <div><dt>Latest Activity</dt><dd>{{ project.last_processed_checkpoint or "N/A" }}</dd></div>
             </dl>
           </article>
           {% endfor %}

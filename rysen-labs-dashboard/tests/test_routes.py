@@ -56,8 +56,8 @@ def test_dashboard_renders_sprint_progress_bars() -> None:
     assert response.status_code == 200
     assert 'id="sprint-progress-bar"' in response.text
     assert 'class="progress-fill"' in response.text
-    assert "width: 38.9%" in response.text
-    assert "width: 47.6%" in response.text
+    assert "width: 44.4%" in response.text
+    assert "width: 57.1%" in response.text
 
 
 def test_sprint_endpoint() -> None:
@@ -68,8 +68,8 @@ def test_sprint_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["progress"]["total_points"] == 36
-    assert payload["progress"]["completed_points"] == 14
-    assert payload["progress"]["progress_percentage"] == 38.9
+    assert payload["progress"]["completed_points"] == 16
+    assert payload["progress"]["progress_percentage"] == 44.4
     assert payload["progress"]["task_counts"]["blocked"] == 0
     assert payload["schedule"]["expected_progress_percentage"] >= 0.0
     assert payload["schedule"]["schedule_status"] in {
@@ -89,7 +89,7 @@ def test_sprint_brief_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["sprint_name"] == "Sprint 01 - Ship Something"
-    assert payload["actual_progress"] == 38.9
+    assert payload["actual_progress"] == 44.4
     assert payload["expected_progress"] >= 0.0
     assert payload["schedule_status"] in {
         "Ahead of Schedule",
@@ -104,6 +104,7 @@ def test_sprint_brief_endpoint() -> None:
         "pbct",
         "rysen-labs-infrastructure",
         "lunch-roulette",
+        "organize-me",
     ]
     assert payload["blockers"] == []
     assert payload["next_incomplete_checkpoints"]
@@ -122,9 +123,14 @@ def test_projects_endpoint() -> None:
         "pbct",
         "rysen-labs-infrastructure",
         "lunch-roulette",
+        "organize-me",
     ]
 
-    lunch_roulette = payload[-1]
+    lunch_roulette = payload[-2]
     assert lunch_roulette["id"] == "lunch-roulette"
     assert lunch_roulette["progress"]["total_points"] == 0
     assert lunch_roulette["progress"]["completed_points"] == 0
+    organize_me = payload[-1]
+    assert organize_me["id"] == "organize-me"
+    assert organize_me["progress"]["total_points"] == 0
+    assert organize_me["progress"]["completed_points"] == 0
